@@ -67,7 +67,8 @@ public class Interpreter {
         };
     }
 
-    public boolean Execute(PCB process, String rawCommand, int CPUTick) throws Exception { // return false: interrupted
+    // return false: interrupted
+    public boolean Execute(PCB process, String rawCommand, int CPUTick) throws Exception {
         var commands = rawCommand.split(",");
         for(int i = 0; i < commands.length; i++) {
             commands[i] = commands[i].trim();
@@ -80,36 +81,39 @@ public class Interpreter {
             // movs
             if(commands[0].equals("movs")) {
                 var addr = getMemoryAddress(commands[1], process);
-                if(mmu.MemoryWrite(process, addr, commands[2], CPUTick)) {
+                if(mmu.MemoryWrite(process, addr, commands[2], CPUTick)) { // MMU MemoryWrite/MemoryRead 返回失败时，说明缺页，拉中断
                     return true;
                 } else {
                     process.IntPageFault = true;
                     process.IntVirAddr = addr;
+                    process.ProcessState = PCB.State.WAITING;
                     return false;
                 }
             }
-            // mov
-            if(!isMemory(commands[1]) && !isMemory(commands[2])) { // RR
+            // mov, mov 不能是内存到内存！
+            if(!isMemory(commands[1]) && !isMemory(commands[2])) { // Register <- Register
                 var left = parseOnlyRegister(commands[1]);
                 var right = parse2Number(commands[2], process);
                 process.RegisterCache[left] = right;
-            } else if(isMemory(commands[1])) {
+            } else if(isMemory(commands[1])) { // Memory <- Register
                 var addr = getMemoryAddress(commands[1], process);
                 var right = parse2Number(commands[2], process);
                 if(mmu.MemoryWrite(process, addr, right, CPUTick)) {
                     return true;
-                } else {
+                } else { // MMU MemoryWrite/MemoryRead 返回失败时，说明缺页，拉中断
                     process.IntPageFault = true;
                     process.IntVirAddr = addr;
+                    process.ProcessState = PCB.State.WAITING;
                     return false;
                 }
-            } else if(isMemory(commands[2])) {
+            } else if(isMemory(commands[2])) { // Register <- Memory
                 var addr = getMemoryAddress(commands[2], process);
                 var left = parseOnlyRegister(commands[1]);
                 var flag =  mmu.MemoryRead(process, addr, CPUTick);
-                if(flag.equals(false)) {
+                if(flag.equals(false)) { // MMU MemoryWrite/MemoryRead 返回失败时，说明缺页，拉中断
                     process.IntVirAddr = addr;
                     process.IntPageFault = true;
+                    process.ProcessState = PCB.State.WAITING;
                     return false;
                 }
                 process.RegisterCache[left] = (int)flag;

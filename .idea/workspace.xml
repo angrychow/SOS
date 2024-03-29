@@ -5,26 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/Timer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/misc/script.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PageEntry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/SwappedOutPage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/script.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/PageFault.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,11 +100,22 @@
       <updated>1711527953067</updated>
       <workItem from="1711527954732" duration="32387000" />
       <workItem from="1711632064165" duration="16878000" />
-      <workItem from="1711696919456" duration="4442000" />
+      <workItem from="1711696919456" duration="10216000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

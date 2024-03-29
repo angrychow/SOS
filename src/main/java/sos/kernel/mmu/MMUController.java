@@ -35,12 +35,14 @@ public class MMUController {
     }
 
     private int foundEmptyPage(PCB nowPCB, int CPUTick) throws Exception {
+        // 首先查看有没有空白页
         for(int i = Constants.PAGE_NUMBER; i < phyPageSize; i++) {
             if(0 == pageBitmap[i]) {
                 pageBitmap[i] = nowPCB.PCBID;
-                return i;
+                return i; // 有的话直接返回
             }
         }
+        // 使用 LRU 策略，选择一个页面换出
         int swappedIndex = 0, minVisTime = 0x7fffffff; // LRU Strategy
         int swappedVirPage = 0;
         for(int i = Constants.PAGE_NUMBER; i < phyPageSize; i++) {
@@ -49,8 +51,10 @@ public class MMUController {
                 swappedIndex = i;
             }
         }
+        // 拷贝页面
         Object[] contents = Arrays.copyOfRange(this.Memory, swappedIndex * pageSize, (swappedIndex + 1) * pageSize);
         PCB task = null;
+        // 寻找预备换出的物理页面对应的 Task,
         for(var tempTask : Tasks) {
             if(tempTask.PCBID == pageBitmap[swappedIndex]) {
                 task = tempTask;
@@ -59,6 +63,7 @@ public class MMUController {
         if(task == null) {
             throw new Exception("task not found, check swapped index -> pageBitmap");
         }
+        // 找到该 Task 哪个虚拟页面映射到这个物理页面
         for(int i = 0; i < pageTableSize; i++) {
             if(this.Memory[task.RegisterCache[Constants.CR] + i] == null) continue;
             if(
@@ -70,8 +75,11 @@ public class MMUController {
                 break;
             }
         }
+
+        // 更换页面 PCB ownership
         pageBitmap[swappedIndex] = nowPCB.PCBID;
         pageLastVisit[swappedIndex] = CPUTick;
+        // 页面加入 Swapped Pages Pool
         swappedPages.add(new SwappedOutPage(pageBitmap[swappedIndex], swappedVirPage, contents));
         return swappedIndex;
     }
@@ -111,6 +119,7 @@ public class MMUController {
         var virPage = page(virtualAddress);
         var phyPage = foundEmptyPage(process, CPUTick);
         Object[] contents = null;
+        // 首先查看这个页面曾经有没有被换出过
         SwappedOutPage p = null;
         for(var page : swappedPages) {
             if(page.VirPage == virPage && page.PCBID == process.PCBID) {
@@ -119,11 +128,14 @@ public class MMUController {
                 break;
             }
         }
+        // 如果有加载被换出的页面，如果没有，加载一个空页面
         if(contents == null) {
             contents = new Object[pageSize];
         } else {
             swappedPages.remove(p);
         }
+
+        // 页面换入
         for(var i = 0 ; i < pageSize; i++) {
             var real = i + phyPage * pageSize;
             if(contents[i] != null)
@@ -131,7 +143,8 @@ public class MMUController {
             else
                 this.Memory[real] = 0;
         }
+
+        // 新建页表项
         this.Memory[process.RegisterCache[Constants.CR] + virPage] = new PageEntry(true, false, phyPage);
-        interruptVector.PageInterrupt = true;
     }
 }

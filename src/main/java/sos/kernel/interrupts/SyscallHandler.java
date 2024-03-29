@@ -9,6 +9,7 @@ public class SyscallHandler {
 
     public static ArrayList<PCB> Tasks;
     public static ArrayList<Timer> Timers;
+    public static ArrayList<PageFault> PageFaults;
     static public boolean Syscall(int number, PCB process, int CPUTick) {
 //        return true;
         switch(number) {
