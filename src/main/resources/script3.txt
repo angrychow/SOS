@@ -1,0 +1,11 @@
+mov,R1,100
+mov,R2,0
+syscall,11
+syscall,13
+mov,R2,1
+syscall,11
+syscall,13
+mov,R2,2
+syscall,11
+syscall,13
+exit

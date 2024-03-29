@@ -1,6 +1,7 @@
 package sos.kernel;
 
 import sos.kernel.interrupts.PageFault;
+import sos.kernel.interrupts.SharedMemoryBlocked;
 import sos.kernel.interrupts.SyscallHandler;
 import sos.kernel.interrupts.Timer;
 import sos.kernel.mmu.MMUController;
@@ -10,6 +11,8 @@ import sos.kernel.sasm.Interpreter;
 import sos.kernel.scheduler.Scheduler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class Main {
@@ -29,17 +32,30 @@ public class Main {
 
     // Check all Interrupt Event is finished or not, called every Tick ends.
     public static void CheckAllInterrupt() throws Exception {
-        for(var timer : SyscallHandler.Timers) {
-            if(timer.WakeUpCPUTime <= cputick) {
+        Iterator<Timer> iteratorTimer = SyscallHandler.Timers.iterator();
+        while (iteratorTimer.hasNext()) {
+            Timer timer = iteratorTimer.next();
+            if (timer.WakeUpCPUTime <= cputick) {
                 Timer.TimerInterruptService(timer.RelativeProcess);
-                SyscallHandler.Timers.remove(timer);
-                return;
+                iteratorTimer.remove(); // 使用迭代器的 remove 方法删除元素
             }
         }
         for(var pageFault : SyscallHandler.PageFaults) {
             PageFault.PageFaultServices(pageFault.RelativeProcess, ++cputick);
         }
         SyscallHandler.PageFaults.clear();
+        if(interruptVector.SharedMemoryRelease) {
+            Iterator<SharedMemoryBlocked> iteratorBlock = SyscallHandler.SharedMemoryBlocks.iterator();
+            while (iteratorBlock.hasNext()) {
+                var smb = iteratorBlock.next();
+                if (smb.RelativeSharedMemory.SharedMemoryID == interruptVector.SharedMemoryReleaseRelativeBlockID) {
+                    SharedMemoryBlocked.SharedMemoryReleaseService(smb.RelativeProcess);
+                    iteratorBlock.remove(); // 使用迭代器的 remove 方法删除元素
+                }
+            }
+            interruptVector.SharedMemoryRelease = false;
+        }
+
     }
 
     // Called to Create A New Task
@@ -119,17 +135,23 @@ public class Main {
         SyscallHandler.Tasks = Tasks;
         SyscallHandler.Timers = new ArrayList<>();
         SyscallHandler.PageFaults = new ArrayList<>();
+        SyscallHandler.SharedMemoryMap = new HashMap<>();
+        SyscallHandler.SharedMemoryBlocks = new ArrayList<>();
+        SyscallHandler.interruptVector = interruptVector;
         PageFault.controller = mmu;
 
         // Fetch Programs in src/resources/script.txt
-        var is = Main.class.getClassLoader().getResourceAsStream("script.txt");
+        var is = Main.class.getClassLoader().getResourceAsStream("script2.txt");
         var buffer = is.readAllBytes();
         is.close();
         var scriptsRaw = new String(buffer);
         var scripts = scriptsRaw.split("\n");
-
-        // create process.
         createProcess(scripts, 0);
+        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
+        buffer = is.readAllBytes();
+        is.close();
+        scriptsRaw = new String(buffer);
+        scripts = scriptsRaw.split("\n");
         createProcess(scripts, 0);
         var p = scheduler.Schedule();
         cputick = 1;
@@ -156,7 +178,7 @@ public class Main {
                     while(p == null) {
                         p = scheduler.Schedule();
                         cputick ++;
-                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
+//                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
                         if(Tasks.isEmpty()) break;
                         CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
                     }

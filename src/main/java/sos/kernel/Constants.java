@@ -6,5 +6,6 @@ public class Constants {
     public static final int R1 = 2;
     public static final int R2 = 3;
     public static final int R3 = 4;
+    public static final int R4 = 5;
     public static final int PAGE_NUMBER = 10;
 }

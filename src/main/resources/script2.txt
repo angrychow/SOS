@@ -1,0 +1,15 @@
+mov,R1,100
+mov,R2,0
+mov,R3,1000
+syscall,12
+mov,R2,1
+mov,R3,2000
+syscall,12
+mov,R2,2
+mov,R3,3000
+syscall,12
+mov,R1,20
+syscall,10
+mov,R1,100
+syscall,13
+exit
