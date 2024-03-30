@@ -3,6 +3,8 @@ package sos.kernel.scheduler;
 import sos.kernel.models.PCB;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Scheduler {
     public ArrayList<PCB> Tasks;
@@ -10,11 +12,17 @@ public class Scheduler {
         Tasks = tasks;
     }
 
-    public PCB Schedule() {
-        for(var task: Tasks) {
-            if(task.ProcessState == PCB.State.READY)
-                return task;
-        }
-        return null;
+    public PCB Schedule(int CPUTick) {
+        ArrayList<PCB> Tasks_ = new ArrayList<>(Tasks);
+        Tasks_.sort((task1, task2) -> {
+            if (task1.Priority != task2.Priority) return task1.Priority - task2.Priority;
+            return task1.LastSchedule - task2.LastSchedule;
+        });
+        Tasks_.removeIf(item -> item.ProcessState != PCB.State.READY);
+        if(Tasks_.isEmpty()) return null;
+        var p = Tasks_.getFirst();
+        p.LastSchedule = CPUTick;
+        return p;
     }
+
 }

@@ -14,6 +14,8 @@ public class PCB {
     public int[] RegisterCache;
     public boolean IntPageFault = false;
     public int IntVirAddr = 0;
+    public int Priority = 1;
+    public int LastSchedule = 0;
 
     @Override
     public String toString() {

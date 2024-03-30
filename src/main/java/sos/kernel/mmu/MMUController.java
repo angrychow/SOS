@@ -93,6 +93,7 @@ public class MMUController {
         PageEntry phyPageEntry = (PageEntry)(this.Memory[process.RegisterCache[Constants.CR] + virPage]);
 
         if(phyPageEntry == null || !phyPageEntry.Valid || pageBitmap[phyPageEntry.PhyPage] != process.PCBID) {
+            process.IntPageFault = true;
             return false; // 中断
         } else {
             this.Memory[phyPageEntry.PhyPage * pageSize + offset] = content;

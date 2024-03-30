@@ -5,15 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SharedMemory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SharedMemoryBlocked.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/script2.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/script3.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/DeviceTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/IO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/RWInterrupt.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +108,8 @@
       <updated>1711527953067</updated>
       <workItem from="1711527954732" duration="32387000" />
       <workItem from="1711632064165" duration="16878000" />
-      <workItem from="1711696919456" duration="16200000" />
+      <workItem from="1711696919456" duration="16406000" />
+      <workItem from="1711771488457" duration="17063000" />
     </task>
     <servers />
   </component>

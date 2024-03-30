@@ -2,9 +2,12 @@ package sos.kernel.models;
 
 import sos.kernel.interrupts.SharedMemoryBlocked;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class InterruptVector {
     public boolean SharedMemoryRelease;
-    public int SharedMemoryReleaseRelativeBlockID;
+    public ArrayList<Integer> SharedMemoryReleaseRelativeBlockID = new ArrayList<Integer>();
     public boolean PageInterrupt;
     public int PageInterruptRelatedPCBID;
     public boolean TimerInterrupt;
@@ -13,6 +16,7 @@ public class InterruptVector {
     public boolean IOInterrupt;
     public int IOInterruptRelatedDeviceID;
     public int IOInterruptRelatedPCBID;
+    public ArrayList<RWInterrupt> RWQueue;
     public InterruptVector() {
         PageInterrupt = false;
         TimerInterrupt = false;

@@ -1,12 +1,11 @@
 package sos.kernel;
 
-import sos.kernel.interrupts.PageFault;
-import sos.kernel.interrupts.SharedMemoryBlocked;
-import sos.kernel.interrupts.SyscallHandler;
-import sos.kernel.interrupts.Timer;
+import sos.kernel.filesystem.FileTree;
+import sos.kernel.interrupts.*;
 import sos.kernel.mmu.MMUController;
 import sos.kernel.models.InterruptVector;
 import sos.kernel.models.PCB;
+import sos.kernel.models.RWInterrupt;
 import sos.kernel.sasm.Interpreter;
 import sos.kernel.scheduler.Scheduler;
 
@@ -29,6 +28,7 @@ public class Main {
     public static int RRMaxTick = 2; // Round Robin Max Tick
     public static Scheduler scheduler; // Task Scheduler
     public static Interpreter interpret; // SOS Assembly Interpreter, or Software CPU
+    public static FileTree FS;
 
     // Check all Interrupt Event is finished or not, called every Tick ends.
     public static void CheckAllInterrupt() throws Exception {
@@ -48,14 +48,23 @@ public class Main {
             Iterator<SharedMemoryBlocked> iteratorBlock = SyscallHandler.SharedMemoryBlocks.iterator();
             while (iteratorBlock.hasNext()) {
                 var smb = iteratorBlock.next();
-                if (smb.RelativeSharedMemory.SharedMemoryID == interruptVector.SharedMemoryReleaseRelativeBlockID) {
+                if (interruptVector.SharedMemoryReleaseRelativeBlockID.contains(smb.RelativeSharedMemory.SharedMemoryID)) {
                     SharedMemoryBlocked.SharedMemoryReleaseService(smb.RelativeProcess);
                     iteratorBlock.remove(); // 使用迭代器的 remove 方法删除元素
                 }
             }
             interruptVector.SharedMemoryRelease = false;
+            interruptVector.SharedMemoryReleaseRelativeBlockID = new ArrayList<>();
         }
-
+        if(!interruptVector.RWQueue.isEmpty()) {
+            Iterator<RWInterrupt> interruptIterator = interruptVector.RWQueue.iterator();
+            while(interruptIterator.hasNext()) {
+                var rwi = interruptIterator.next();
+                System.out.println(rwi);
+                IO.IOService(rwi, controller, cputick);
+                interruptIterator.remove();
+            }
+        }
     }
 
     // Called to Create A New Task
@@ -66,8 +75,8 @@ public class Main {
 //        newProcess
         Tasks.add(newProcess);
         for(var i = 0 ; i < scripts.length; i ++) {
-            var success = controller.MemoryWrite(newProcess, i, scripts[i], CPUTick);
-            if(!success) {
+            controller.MemoryWrite(newProcess, i, scripts[i], CPUTick);
+            if(newProcess.IntPageFault) {
                 controller.PageReenter(newProcess, newProcess.IntVirAddr, CPUTick);
                 controller.MemoryWrite(newProcess, i, scripts[i], CPUTick);
                 newProcess.IntPageFault = false;
@@ -107,6 +116,22 @@ public class Main {
         if(!result) {
             if(p.ProcessState == PCB.State.TERMINATED) {
                 Tasks.remove(p);
+                for(var key : SyscallHandler.SharedMemoryMap.keySet()) {
+                    var sharedMemory = SyscallHandler.SharedMemoryMap.get(key);
+                    if(sharedMemory.Owner == p.PCBID) {
+                        interruptVector.SharedMemoryReleaseRelativeBlockID.add(sharedMemory.SharedMemoryID);
+                    }
+                }
+                if(!interruptVector.SharedMemoryReleaseRelativeBlockID.isEmpty()) interruptVector.SharedMemoryRelease = true;
+                var fdIterator = FS.FDTable.iterator();
+                while(fdIterator.hasNext()) {
+                    var fd = fdIterator.next();
+                    if(fd.PCBID == p.PCBID) {
+                        fd.FileNode.Link = null;
+                        fdIterator.remove();
+                        System.out.println(fd);
+                    }
+                }
                 return false;
             }
             if(p.IntPageFault) {
@@ -122,13 +147,10 @@ public class Main {
         return true;
     }
 
-    // Main Function.
-    public static void main(String[] args) throws Exception {
-
-
-        // Bootstrapping. Fill the Necessary Arguments.
-        System.out.println("SOS Bootstrapping ...");
+    public static void Bootstrap()  {
+        interruptVector.RWQueue = new ArrayList<>();
         MMUController mmu = new MMUController(Tasks, Memory, pageSize, virAddrSize, interruptVector);
+        FS = new FileTree(interruptVector);
         controller = mmu;
         interpret = new Interpreter(mmu);
         scheduler = new Scheduler(Tasks);
@@ -138,10 +160,19 @@ public class Main {
         SyscallHandler.SharedMemoryMap = new HashMap<>();
         SyscallHandler.SharedMemoryBlocks = new ArrayList<>();
         SyscallHandler.interruptVector = interruptVector;
+        SyscallHandler.FS = FS;
+        SyscallHandler.MMU = controller;
         PageFault.controller = mmu;
+    }
+
+    // Main Function.
+    public static void main(String[] args) throws Exception {
+        // Bootstrapping. Fill the Necessary Arguments.
+        System.out.println("SOS Bootstrapping ...");
+        Bootstrap();
 
         // Fetch Programs in src/resources/script.txt
-        var is = Main.class.getClassLoader().getResourceAsStream("script2.txt");
+        var is = Main.class.getClassLoader().getResourceAsStream("scriptIO.txt");
         var buffer = is.readAllBytes();
         is.close();
         var scriptsRaw = new String(buffer);
@@ -153,7 +184,7 @@ public class Main {
         scriptsRaw = new String(buffer);
         scripts = scriptsRaw.split("\n");
         createProcess(scripts, 0);
-        var p = scheduler.Schedule();
+        var p = scheduler.Schedule(cputick);
         cputick = 1;
 
         // if we want to execute commands by steps, use 'blocked'
@@ -171,12 +202,12 @@ public class Main {
                     p.ProcessState = PCB.State.READY;
                 }
                 RRNowTick = 0;
-                p = scheduler.Schedule();
+                p = scheduler.Schedule(cputick);
                 if(p != null) {
                     p.ProcessState = PCB.State.RUNNING;
                 } else {
                     while(p == null) {
-                        p = scheduler.Schedule();
+                        p = scheduler.Schedule(cputick);
                         cputick ++;
 //                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
                         if(Tasks.isEmpty()) break;
@@ -186,5 +217,6 @@ public class Main {
             }
             CheckAllInterrupt(); // Interrupt Cycle.
         }
+//        System.out.println(FS.FoundFile("root/home"));
     }
 }
