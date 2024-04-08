@@ -3,9 +3,7 @@ package sos.kernel;
 import sos.kernel.filesystem.FileTree;
 import sos.kernel.interrupts.*;
 import sos.kernel.mmu.MMUController;
-import sos.kernel.models.InterruptVector;
-import sos.kernel.models.PCB;
-import sos.kernel.models.RWInterrupt;
+import sos.kernel.models.*;
 import sos.kernel.sasm.Interpreter;
 import sos.kernel.scheduler.Scheduler;
 
@@ -29,6 +27,58 @@ public class Main {
     public static Scheduler scheduler; // Task Scheduler
     public static Interpreter interpret; // SOS Assembly Interpreter, or Software CPU
     public static FileTree FS;
+
+    public static PCB CurrentProcess = null;
+
+    public static SOSInfo GetSOSInfo() {
+        var ret = new SOSInfo();
+        ret.pcbList = Tasks;
+        ret.nowProcess = CurrentProcess;
+        ret.pages = new HashMap<>();
+        for(var task : Tasks) {
+            var m = new HashMap<String,PageEntry>();
+            ret.pages.put(String.valueOf(task.PCBID), m);
+            final int PAGE_ENTRY_SIZE = virAddrSize / pageSize;
+            for(var i = 0; i < PAGE_ENTRY_SIZE; i ++) {
+                if(
+                    Memory[task.RegisterCache[Constants.CR] + i] != null &&
+                    Memory[task.RegisterCache[Constants.CR] + i] instanceof PageEntry
+                ) {
+                    m.put(String.valueOf(i), (PageEntry) Memory[task.RegisterCache[Constants.CR] + i]);
+                }
+            }
+        }
+        return ret;
+    }
+
+    public static boolean CreateFile(
+            String filename,
+            String filetype,
+            String deviceName,
+            String content,
+            String path
+    ) {
+        var f = new FileTreeNode();
+        f.Name = filename;
+        if(filetype.equals("FILE")) {
+            f.Type = FileTreeNode.FileType.FILE;
+        } else if(filetype.equals("DIRECTORY")) {
+            f.Type = FileTreeNode.FileType.DIRECTORY;
+        } else {
+            f.Type = FileTreeNode.FileType.DEVICES;
+        }
+        f.DeviceName = deviceName;
+        f.contents = content;
+        return FS.CreateFile(path, f);
+    }
+
+    public static boolean DeleteFile(String path) {
+        return FS.DeleteFile(path);
+    }
+
+    public static FileTreeNode FoundFile(String path) {
+        return FS.FoundFile(path);
+    }
 
     // Check all Interrupt Event is finished or not, called every Tick ends.
     public static void CheckAllInterrupt() throws Exception {
@@ -69,8 +119,21 @@ public class Main {
 
     // Called to Create A New Task
     // TODO: Apply A Better PCBID Allocation Algorithm
-    public static PCB createProcess(String[] scripts, int CPUTick) throws Exception {
-        PCB newProcess = new PCB(PCBCounter++);
+    public static PCB createProcess(String[] scripts, int CPUTick, String pName) throws Exception {
+        var PCBID = -1;
+        for(var i = 1; i < Constants.PAGE_TABLE_NUMBER; i++) {
+            int finalI = i;
+            var found = Tasks.stream().filter(element -> element.PCBID == finalI).findFirst();
+            if(found.isEmpty()) {
+                PCBID = i;
+                break;
+            }
+        }
+        if(PCBID == -1) {
+            System.out.println("[Create Process Failed] Current Running Processes Up To Limit!");
+            return null;
+        }
+        PCB newProcess = new PCB(PCBID, pName);
         newProcess.RegisterCache[Constants.CR] = (newProcess.PCBID - 1) * virAddrSize / pageSize;
 //        newProcess
         Tasks.add(newProcess);
@@ -84,6 +147,11 @@ public class Main {
         }
         newProcess.ProcessState = PCB.State.READY;
         return newProcess;
+    }
+
+    public static boolean CreateProcess(String script, String pname) throws Exception {
+        var p = createProcess(script.split("\n"), cputick, pname);
+        return p != null;
     }
 
     // SOS's Next Tick. Return True If There Is No Interrupt.
@@ -110,6 +178,11 @@ public class Main {
                 instruction
         );
 
+        interruptVector.LastExecCommand = String.format("[RUNNING] CPU Tick: %d, PCBID: %d, Instruction: %s \n",
+                cputick,
+                p.PCBID,
+                instruction);
+
         // Pass the instruction 2 interpreter
         // if Interpreter Return false, means Interrupt Occurs.
         var result = interpret.Execute(p, (String) instruction, cputick++);
@@ -132,6 +205,7 @@ public class Main {
                         System.out.println(fd);
                     }
                 }
+                controller.ClearPageTable(p);
                 return false;
             }
             if(p.IntPageFault) {
@@ -147,7 +221,7 @@ public class Main {
         return true;
     }
 
-    public static void Bootstrap()  {
+    public static void Bootstrap() throws Exception  {
         interruptVector.RWQueue = new ArrayList<>();
         MMUController mmu = new MMUController(Tasks, Memory, pageSize, virAddrSize, interruptVector);
         FS = new FileTree(interruptVector);
@@ -163,6 +237,62 @@ public class Main {
         SyscallHandler.FS = FS;
         SyscallHandler.MMU = controller;
         PageFault.controller = mmu;
+
+
+        var is = Main.class.getClassLoader().getResourceAsStream("scriptIO.txt");
+        var buffer = is.readAllBytes();
+        is.close();
+        var scriptsRaw = new String(buffer);
+        var scripts = scriptsRaw.split("\n");
+        createProcess(scripts, 0, "Process1");
+        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
+        buffer = is.readAllBytes();
+        is.close();
+        scriptsRaw = new String(buffer);
+        scripts = scriptsRaw.split("\n");
+        createProcess(scripts, 0, "Process2");
+
+        cputick = 1;
+    }
+
+    public static String NextTick() throws Exception {
+        if(Tasks.isEmpty()) return "[IDLE] No Task In Tasks Queue";
+        var p = CurrentProcess;
+        if(p == null) {
+            p = scheduler.Schedule(cputick);
+            CurrentProcess = p;
+        }
+        int startCPUTick = cputick;
+//            var words = blocked.nextLine();
+//            if(words.contains("exit")) {
+//                break;
+//            }
+        var interrupted = !nextTick(p);
+        RRNowTick += cputick - startCPUTick;
+        if(interrupted || RRNowTick > RRMaxTick) { // RR time up or interrupt, change Tasks.
+            if(RRNowTick > RRMaxTick && !interrupted) {
+                p.ProcessState = PCB.State.READY;
+            }
+            RRNowTick = 0;
+            p = scheduler.Schedule(cputick);
+            if(p != null) {
+                p.ProcessState = PCB.State.RUNNING;
+                CurrentProcess = p;
+            } else {
+                while(p == null) {
+                    p = scheduler.Schedule(cputick);
+                    cputick ++;
+                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
+                    if(Tasks.isEmpty()) {
+                        break;
+                    }
+                    CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
+                }
+                CurrentProcess = p;
+            }
+        }
+        CheckAllInterrupt(); // Interrupt Cycle.
+        return interruptVector.LastExecCommand;
     }
 
     // Main Function.
@@ -172,50 +302,12 @@ public class Main {
         Bootstrap();
 
         // Fetch Programs in src/resources/script.txt
-        var is = Main.class.getClassLoader().getResourceAsStream("scriptIO.txt");
-        var buffer = is.readAllBytes();
-        is.close();
-        var scriptsRaw = new String(buffer);
-        var scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0);
-        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
-        buffer = is.readAllBytes();
-        is.close();
-        scriptsRaw = new String(buffer);
-        scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0);
-        var p = scheduler.Schedule(cputick);
-        cputick = 1;
+
 
         // if we want to execute commands by steps, use 'blocked'
 //        var blocked = new Scanner(System.in);
         while(!Tasks.isEmpty()) {
-            int startCPUTick = cputick;
-//            var words = blocked.nextLine();
-//            if(words.contains("exit")) {
-//                break;
-//            }
-            var interrupted = !nextTick(p);
-            RRNowTick += cputick - startCPUTick;
-            if(interrupted || RRNowTick > RRMaxTick) { // RR time up or interrupt, change Tasks.
-                if(RRNowTick > RRMaxTick && !interrupted) {
-                    p.ProcessState = PCB.State.READY;
-                }
-                RRNowTick = 0;
-                p = scheduler.Schedule(cputick);
-                if(p != null) {
-                    p.ProcessState = PCB.State.RUNNING;
-                } else {
-                    while(p == null) {
-                        p = scheduler.Schedule(cputick);
-                        cputick ++;
-//                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
-                        if(Tasks.isEmpty()) break;
-                        CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
-                    }
-                }
-            }
-            CheckAllInterrupt(); // Interrupt Cycle.
+            NextTick();
         }
 //        System.out.println(FS.FoundFile("root/home"));
     }

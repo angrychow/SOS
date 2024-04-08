@@ -16,6 +16,7 @@ public class PCB {
     public int IntVirAddr = 0;
     public int Priority = 1;
     public int LastSchedule = 0;
+    public String ProcessName;
 
     @Override
     public String toString() {
@@ -28,8 +29,9 @@ public class PCB {
                 '}';
     }
 
-    public PCB(int PCBID){
+    public PCB(int PCBID, String pName){
         this.PCBID = PCBID;
+        this.ProcessName = pName;
         this.ProcessState = State.WAITING; // 创建时全为 WAITING，直到代码全部被拉入内存才切换
         this.RegisterCache = new int[32]; // [0]: CR; [1]: PC
     }

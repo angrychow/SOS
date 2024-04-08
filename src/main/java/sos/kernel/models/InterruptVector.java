@@ -17,6 +17,7 @@ public class InterruptVector {
     public int IOInterruptRelatedDeviceID;
     public int IOInterruptRelatedPCBID;
     public ArrayList<RWInterrupt> RWQueue;
+    public String LastExecCommand = "";
     public InterruptVector() {
         PageInterrupt = false;
         TimerInterrupt = false;

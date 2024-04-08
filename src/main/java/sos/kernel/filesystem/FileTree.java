@@ -17,13 +17,14 @@ public class FileTree {
         Root.Name = "root_";
         var Root_ = new FileTreeNode();
         Root_.Name = "root";
+        Root_.FilePath = "root";
         var Std = new FileTreeNode();
         Std.DeviceName = "std";
         Std.Name = "std";
         Std.Type = FileTreeNode.FileType.DEVICES;
-        Root_.Sons.add(Std);
         Root_.Type = FileTreeNode.FileType.DIRECTORY;
         Root.Sons.add(Root_);
+        this.CreateFile("root", Std);
         interruptVector = v;
     }
     public FileTreeNode FoundFile(String FilePath) {
@@ -56,6 +57,7 @@ public class FileTree {
         if(prt == null) return false;
         if(prt.Type != FileTreeNode.FileType.DIRECTORY) return false;
         prt.Sons.add(Node);
+        Node.FilePath = FilePath + '/' + Node.Name;
         return true;
     }
 

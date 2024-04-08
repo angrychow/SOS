@@ -30,13 +30,13 @@ public class MMUController {
         this.pageTableSize = virAddrSize / pageSize;
         phyPageSize = m.length / pageSize;
         swappedPages = new ArrayList<>();
-        pagesStart = pageTableSize * Constants.PAGE_NUMBER;
+        pagesStart = pageTableSize * Constants.PAGE_TABLE_NUMBER;
         interruptVector = vector;
     }
 
     private int foundEmptyPage(PCB nowPCB, int CPUTick) throws Exception {
         // 首先查看有没有空白页
-        for(int i = Constants.PAGE_NUMBER; i < phyPageSize; i++) {
+        for(int i = Constants.PAGE_TABLE_NUMBER; i < phyPageSize; i++) {
             if(0 == pageBitmap[i]) {
                 pageBitmap[i] = nowPCB.PCBID;
                 return i; // 有的话直接返回
@@ -45,7 +45,7 @@ public class MMUController {
         // 使用 LRU 策略，选择一个页面换出
         int swappedIndex = 0, minVisTime = 0x7fffffff; // LRU Strategy
         int swappedVirPage = 0;
-        for(int i = Constants.PAGE_NUMBER; i < phyPageSize; i++) {
+        for(int i = Constants.PAGE_TABLE_NUMBER; i < phyPageSize; i++) {
             if(pageLastVisit[i] < minVisTime) {
                 minVisTime = pageLastVisit[i];
                 swappedIndex = i;
@@ -113,6 +113,17 @@ public class MMUController {
 //            this.Memory[phyPageEntry.PhyPage * pageSize + offset] = content;
             pageLastVisit[phyPageEntry.PhyPage] = CPUTick;
             return this.Memory[phyPageEntry.PhyPage * pageSize + offset];
+        }
+    }
+
+    public void ClearPageTable(PCB process) {
+        for(int i = 0; i < pageTableSize; i++) {
+            Memory[process.RegisterCache[Constants.CR] + i] = null;
+        }
+        for(int i = Constants.PAGE_TABLE_NUMBER; i < phyPageSize; i++) {
+            if(pageBitmap[i] == process.PCBID) {
+                pageBitmap[i] = 0;
+            }
         }
     }
 

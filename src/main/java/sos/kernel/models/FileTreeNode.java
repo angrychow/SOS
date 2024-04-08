@@ -18,6 +18,7 @@ public class FileTreeNode {
     public String Name;
     public FileDescriptor Link;
     public String contents = "";
+    public String FilePath = "";
 
     @Override
     public String toString() {

@@ -5,20 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/DeviceTable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/IO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/RWInterrupt.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Constants.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/SOSInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +33,11 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
@@ -50,6 +53,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Controller.executor": "Run",
     "Application.Main.executor": "Run",
     "Maven.SOS [clean].executor": "Run",
     "Maven.SOS [deploy].executor": "Run",
@@ -71,7 +75,20 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Controller">
+    <configuration name="Controller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="sos.http.Controller" />
+      <module name="SOS" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="sos.http.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="sos.kernel.Main" />
       <module name="SOS" />
@@ -87,6 +104,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Controller" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -109,7 +127,9 @@
       <workItem from="1711527954732" duration="32387000" />
       <workItem from="1711632064165" duration="16878000" />
       <workItem from="1711696919456" duration="16406000" />
-      <workItem from="1711771488457" duration="17063000" />
+      <workItem from="1711771488457" duration="17497000" />
+      <workItem from="1711791360185" duration="37000" />
+      <workItem from="1711806361793" duration="36042000" />
     </task>
     <servers />
   </component>
@@ -121,7 +141,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
