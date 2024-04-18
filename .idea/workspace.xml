@@ -5,18 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Constants.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/SOSInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +34,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 1
@@ -71,7 +67,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -130,6 +126,8 @@
       <workItem from="1711771488457" duration="17497000" />
       <workItem from="1711791360185" duration="37000" />
       <workItem from="1711806361793" duration="36042000" />
+      <workItem from="1712817958153" duration="13195000" />
+      <workItem from="1713428252188" duration="39000" />
     </task>
     <servers />
   </component>
@@ -152,5 +150,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java</url>
+          <line>27</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

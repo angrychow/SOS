@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class Controller {
     public static void main(String[] args) throws Exception {
@@ -26,7 +28,7 @@ public class Controller {
         server.createContext("/api/find", new FindFileHandle());
         server.createContext("/api/create", new CreateFileHandle());
         server.createContext("/api/delete", new DeleteFileHandle());
-        server.setExecutor(null);
+        server.setExecutor(Executors.newFixedThreadPool(1));
         server.start();
     }
     static class TickHandle implements HttpHandler {
@@ -133,7 +135,9 @@ public class Controller {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            System.out.println(obj);
             var str_ = JSON.toJSONString(obj);
+//            System.out.printf("[Found File] %s \n", str_);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, str_.getBytes().length);
             OutputStream outputStream = exchange.getResponseBody();

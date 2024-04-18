@@ -14,7 +14,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static Object[] Memory = new Object[1024 * 50]; // SOS Mock Memory
+//    public static Object[] Memory = new Object[1024 * 50]; // SOS Mock MemoryWrite
+    public static Object[] Memory = new Object[1024 * 15]; // Display Page Demanding
     public static ArrayList<PCB> Tasks = new ArrayList<PCB>(); // Tasks Array
     public static InterruptVector interruptVector = new InterruptVector(); // Interrupt Vector, not been used yet
     public static int PCBCounter = 1; // PCB Counter, used to allocate PCBID, should be modified to a better version.
@@ -209,6 +210,7 @@ public class Main {
                 return false;
             }
             if(p.IntPageFault) {
+                p.ProcessState = PCB.State.WAITING;
                 SyscallHandler.PageFaults.add(new PageFault(p));
             }
             if(p.ProcessState == PCB.State.WAITING) {
@@ -239,18 +241,18 @@ public class Main {
         PageFault.controller = mmu;
 
 
-        var is = Main.class.getClassLoader().getResourceAsStream("scriptIO.txt");
-        var buffer = is.readAllBytes();
-        is.close();
-        var scriptsRaw = new String(buffer);
-        var scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0, "Process1");
-        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
-        buffer = is.readAllBytes();
-        is.close();
-        scriptsRaw = new String(buffer);
-        scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0, "Process2");
+//        var is = Main.class.getClassLoader().getResourceAsStream("scriptIO.txt");
+//        var buffer = is.readAllBytes();
+//        is.close();
+//        var scriptsRaw = new String(buffer);
+//        var scripts = scriptsRaw.split("\n");
+//        createProcess(scripts, 0, "Process1");
+//        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
+//        buffer = is.readAllBytes();
+//        is.close();
+//        scriptsRaw = new String(buffer);
+//        scripts = scriptsRaw.split("\n");
+//        createProcess(scripts, 0, "Process2");
 
         cputick = 1;
     }
@@ -289,9 +291,10 @@ public class Main {
                     CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
                 }
                 CurrentProcess = p;
+                p.ProcessState = PCB.State.RUNNING;
             }
         }
-        CheckAllInterrupt(); // Interrupt Cycle.
+        if(!interrupted) CheckAllInterrupt(); // Interrupt Cycle.
         return interruptVector.LastExecCommand;
     }
 
