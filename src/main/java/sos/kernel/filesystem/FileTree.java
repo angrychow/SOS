@@ -4,7 +4,7 @@ import sos.kernel.models.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+//TODO:link function
 public class FileTree {
     public FileTreeNode Root;
     public ArrayList<FileDescriptor> FDTable;
@@ -32,9 +32,9 @@ public class FileTree {
         return FoundFile_(list, Root);
     }
 
-    private FileTreeNode FoundFile_(ArrayList<String> FilePath, FileTreeNode Node) {
+    private FileTreeNode FoundFile_(ArrayList<String> FilePath, FileTreeNode Node) {//找目录
         if(FilePath.isEmpty()) {
-            return Node;
+            return Node;//查到最底层了，返回
         }
         var name = FilePath.getFirst();
         FilePath.removeFirst();
@@ -44,16 +44,16 @@ public class FileTree {
         FileTreeNode n = null;
         for(var son : Node.Sons) {
             if(son.Name.equals(name)) {
-                n = son;
+                n = son;//在儿子里找符合名字的目录
             }
         }
         if(n == null) return null;
-        return FoundFile_(FilePath, n);
+        return FoundFile_(FilePath, n);//递归查找
     }
 
     public boolean CreateFile(String FilePath, FileTreeNode Node) {
         var list = new ArrayList<>(Arrays.asList(FilePath.split("/")));
-        var prt = FoundFile_(list, Root);
+        var prt = FoundFile_(list, Root);//找到父目录
         if(prt == null) return false;
         if(prt.Type != FileTreeNode.FileType.DIRECTORY) return false;
         prt.Sons.add(Node);
@@ -98,7 +98,7 @@ public class FileTree {
     }
 
     public void ReadFile(FileDescriptor FD, int size, int addr, PCB process) {
-        interruptVector.RWQueue.add(new RWInterrupt(process, FD.FileNode, FD.cursor, size, 0, RWInterrupt.RWType.READ, addr));
+        interruptVector.RWQueue.add(new RWInterrupt(process, FD.FileNode, 0, size, 0, RWInterrupt.RWType.READ, addr));
         process.ProcessState = PCB.State.WAITING;
     }
     public void WriteFile(FileDescriptor FD, int contentsAddr, PCB process) {

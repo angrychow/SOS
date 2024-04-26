@@ -11,13 +11,13 @@ public class Scheduler {
     public Scheduler(ArrayList<PCB> tasks) {
         Tasks = tasks;
     }
-
+//TODo: Downgrade when Too many swap out
     public PCB Schedule(int CPUTick) {
         ArrayList<PCB> Tasks_ = new ArrayList<>(Tasks);
         Tasks_.sort((task1, task2) -> {
             if (task1.Priority != task2.Priority) return task1.Priority - task2.Priority;
             return task1.LastSchedule - task2.LastSchedule;
-        });
+        });//优先级+最长不使用优先调度
         Tasks_.removeIf(item -> item.ProcessState != PCB.State.READY);
         if(Tasks_.isEmpty()) return null;
         var p = Tasks_.getFirst();

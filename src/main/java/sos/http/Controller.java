@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
+//TODO: 整体设备使用情况、内存使用情况
 public class Controller {
     public static void main(String[] args) throws Exception {
         sos.kernel.Main.Bootstrap();
@@ -28,8 +28,27 @@ public class Controller {
         server.createContext("/api/find", new FindFileHandle());
         server.createContext("/api/create", new CreateFileHandle());
         server.createContext("/api/delete", new DeleteFileHandle());
+        server.createContext("/api/physical-memory", new PhysicalMemoryHandle());
         server.setExecutor(Executors.newFixedThreadPool(1));
         server.start();
+    }
+    static class PhysicalMemoryHandle implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            var str = "";
+            try {
+                str = sos.kernel.Main.GetPhysicalMemory();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String response = str;
+
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(response.getBytes());
+
+            outputStream.close();
+        }
     }
     static class TickHandle implements HttpHandler {
         @Override

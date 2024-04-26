@@ -28,9 +28,9 @@ public class MMUController {
         pageLastVisit = new int[m.length / pageSize];
         this.pageSize = pageSize;
         this.pageTableSize = virAddrSize / pageSize;
-        phyPageSize = m.length / pageSize;
-        swappedPages = new ArrayList<>();
-        pagesStart = pageTableSize * Constants.PAGE_TABLE_NUMBER;
+        phyPageSize = m.length / pageSize; // phyPageSize指明了物理内存有多少页
+        swappedPages = new ArrayList<>(); // 用于存放被换出的页面
+        pagesStart = pageTableSize * Constants.PAGE_TABLE_NUMBER; //页表项最多能有PAGE_TABLE_NUMBER个进程
         interruptVector = vector;
     }
 
@@ -149,7 +149,7 @@ public class MMUController {
 
         // 页面换入
         for(var i = 0 ; i < pageSize; i++) {
-            var real = i + phyPage * pageSize;
+            var real = i + phyPage * pageSize;//真实的物理地址
             if(contents[i] != null)
                 this.Memory[real] = contents[i];
             else
