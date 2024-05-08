@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import sos.kernel.device.DeviceStatus;
 import sos.kernel.device.HttpDevice1;
+import sos.kernel.filesystem.FileTree;
 import sos.kernel.models.FileTreeNode;
 import sos.kernel.models.MMUInfo;
 
@@ -17,8 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static sos.kernel.Main.DeviceTable;
-import static sos.kernel.Main.controller;
+import static sos.kernel.Main.*;
 
 public class Controller {
     public static void main(String[] args) throws Exception {
@@ -36,6 +36,7 @@ public class Controller {
         server.createContext("/api/find", new FindFileHandle());
         server.createContext("/api/create", new CreateFileHandle());
         server.createContext("/api/delete", new DeleteFileHandle());
+        server.createContext("/api/link",new LinkFileHandle());
         server.createContext("/api/MMU_info", new MMUInfoHandle());
         server.createContext("/api/device_table", new DevicesHandle());
         server.createContext("/api/http_input", new HttpInputHandle());
@@ -43,6 +44,26 @@ public class Controller {
         server.start();
     }
 
+    static class LinkFileHandle() implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            var str = exchange.getRequestBody();
+            Map<String, Object> body = JSON.parseObject(str);
+            var src = (String) body.get("src");
+            var dst = (String) body.get("dst");//将dst文件变为链接文件,链接到src文件
+            var ok = false;
+            try {
+                ok = FS.SymbolicLink(src, dst);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String response = ok ? "OK" :"Not OK";
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(response.getBytes());
+            outputStream.close();
+        }
+    }
     static class DevicesHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {

@@ -7,6 +7,7 @@ public class FileTreeNode {
         FILE,
         DIRECTORY,
         DEVICES,
+        SYMBOLIC_LINK
     }
     public FileTreeNode() {
         Sons = new ArrayList<>();

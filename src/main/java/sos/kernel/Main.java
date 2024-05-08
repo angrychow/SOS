@@ -72,7 +72,10 @@ public class Main {
             f.Type = FileTreeNode.FileType.FILE;
         } else if (filetype.equals("DIRECTORY")) {
             f.Type = FileTreeNode.FileType.DIRECTORY;
-        } else {
+        } else if (filetype.equals("SYMBOLIC_LINK")) {
+            f.Type = FileTreeNode.FileType.SYMBOLIC_LINK;
+        }
+         else {
             f.Type = FileTreeNode.FileType.DEVICES;
         }
         f.DeviceName = deviceName;
