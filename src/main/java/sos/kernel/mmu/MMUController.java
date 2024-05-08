@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class MMUController {
     public Object[] Memory;
     public ArrayList<PCB> Tasks;
-    int[] pageBitmap; // indicate who(PCBID) holds this page
+    public int[] pageBitmap; // indicate who(PCBID) holds this page
     int[] pageLastVisit;
     int pageSize;
     int pageTableSize;
@@ -87,6 +87,15 @@ public class MMUController {
     private int page(int addr) { return addr / pageSize; }
     private int offset(int addr) { return addr % pageSize; }
 
+    public Double MemoryUsage() {
+        int used=0;
+        for(int i=0;i<Memory.length; i++)
+        {
+            if(Memory[i]!=null)
+                used++;
+        }
+        return (double)used/Memory.length;
+    }
     public boolean MemoryWrite(PCB process, int virtualAddress, Object content, int CPUTick) throws Exception {
         int virPage = page(virtualAddress);
         int offset = offset(virtualAddress);

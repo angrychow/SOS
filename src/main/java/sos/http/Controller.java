@@ -4,20 +4,28 @@ import com.alibaba.fastjson2.JSON;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import sos.kernel.device.DeviceStatus;
+import sos.kernel.device.HttpDevice1;
 import sos.kernel.models.FileTreeNode;
-import sos.kernel.models.PCB;
+import sos.kernel.models.MMUInfo;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-//TODO: 整体设备使用情况、内存使用情况
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static sos.kernel.Main.DeviceTable;
+import static sos.kernel.Main.controller;
+
 public class Controller {
     public static void main(String[] args) throws Exception {
         sos.kernel.Main.Bootstrap();
+        HttpDevice1 httpDevice1 = new HttpDevice1();
+        httpDevice1.DeviceName = "httpdevice1";
+        httpDevice1.LoadDriver();
         var server = HttpServer.create(
                 new InetSocketAddress(8080),
                 0
@@ -28,25 +36,49 @@ public class Controller {
         server.createContext("/api/find", new FindFileHandle());
         server.createContext("/api/create", new CreateFileHandle());
         server.createContext("/api/delete", new DeleteFileHandle());
-        server.createContext("/api/physical-memory", new PhysicalMemoryHandle());
+        server.createContext("/api/MMU_info", new MMUInfoHandle());
+        server.createContext("/api/device_table", new DevicesHandle());
+        server.createContext("/api/http_input", new HttpInputHandle());
         server.setExecutor(Executors.newFixedThreadPool(1));
         server.start();
     }
-    static class PhysicalMemoryHandle implements HttpHandler {
+
+    static class DevicesHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            var str = "";
+            var devices = DeviceTable;
+            Map<String, DeviceStatus> deviceStatusMap = devices.stream()
+                    .collect(Collectors.toMap(i->i.DeviceName, i->i.Status));
+            var str = JSON.toJSONString(deviceStatusMap);
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, str.getBytes().length);
+            OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(str.getBytes());
+            outputStream.close();
+        }
+    }
+
+
+    static class MMUInfoHandle implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            int[] pageBitmap;
             try {
-                str = sos.kernel.Main.GetPhysicalMemory();
+                pageBitmap = sos.kernel.Main.GetPhysicalMemory();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            String response = str;
-
+            Map<String,Integer> indexValueMap= IntStream.range(0,pageBitmap.length)
+                    .filter(i->pageBitmap[i]!=0)
+                    .boxed()
+                    .collect(Collectors.toMap(String::valueOf, i->pageBitmap[i]));
+            MMUInfo mmuInfo = new MMUInfo();
+            mmuInfo.pageBitmap= indexValueMap;
+            mmuInfo.memoryUsage= controller.MemoryUsage();
+            String response =JSON.toJSONString(mmuInfo);
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream outputStream = exchange.getResponseBody();
             outputStream.write(response.getBytes());
-
             outputStream.close();
         }
     }
@@ -80,6 +112,26 @@ public class Controller {
             var ok = false;
             try {
                 ok = sos.kernel.Main.CreateProcess((String) script, (String) pname);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String response = ok ? "OK" :"Not OK";
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(response.getBytes());
+            outputStream.close();
+        }
+    }
+    static class HttpInputHandle implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            var str = exchange.getRequestBody();
+            Map<String, Object> body = JSON.parseObject(str);
+            var deviceName = (String) body.get("deviceName");
+            var content = (String) body.get("content");
+            var ok = false;
+            try {
+                ok = sos.kernel.Main.HttpInput(deviceName, content);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

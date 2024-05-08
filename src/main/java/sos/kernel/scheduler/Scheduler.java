@@ -11,7 +11,6 @@ public class Scheduler {
     public Scheduler(ArrayList<PCB> tasks) {
         Tasks = tasks;
     }
-//TODo: Downgrade when Too many swap out
     public PCB Schedule(int CPUTick) {
         ArrayList<PCB> Tasks_ = new ArrayList<>(Tasks);
         Tasks_.sort((task1, task2) -> {

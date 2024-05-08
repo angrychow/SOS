@@ -18,13 +18,18 @@ public class FileTree {
         var Root_ = new FileTreeNode();
         Root_.Name = "root";
         Root_.FilePath = "root";
+        var Dev=new FileTreeNode();
+        Dev.Name="dev";
+        Dev.Type=FileTreeNode.FileType.DIRECTORY;
+        Dev.FilePath="root/dev";
         var Std = new FileTreeNode();
         Std.DeviceName = "std";
         Std.Name = "std";
         Std.Type = FileTreeNode.FileType.DEVICES;
         Root_.Type = FileTreeNode.FileType.DIRECTORY;
         Root.Sons.add(Root_);
-        this.CreateFile("root", Std);
+        Root_.Sons.add(Dev);
+        this.CreateFile("root/dev", Std);
         interruptVector = v;
     }
     public FileTreeNode FoundFile(String FilePath) {

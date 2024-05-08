@@ -1,23 +1,25 @@
 package sos.kernel;
 
+import sos.kernel.device.AbstractDevice;
+import sos.kernel.device.DeviceStatus;
 import sos.kernel.filesystem.FileTree;
 import sos.kernel.interrupts.*;
 import sos.kernel.mmu.MMUController;
 import sos.kernel.models.*;
 import sos.kernel.sasm.Interpreter;
 import sos.kernel.scheduler.Scheduler;
-import sos.kernel.filesystem.DeviceTable;
+import sos.kernel.device.StdDevice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Scanner;
 
 public class Main {
 
     //    public static Object[] Memory = new Object[1024 * 50]; // SOS Mock MemoryWrite
     public static Object[] Memory = new Object[1024 * 15]; // Display Page Demanding
     public static ArrayList<PCB> Tasks = new ArrayList<PCB>(); // Tasks Array
+    public static ArrayList<AbstractDevice> DeviceTable = new ArrayList<AbstractDevice>(); // Device Table
     public static InterruptVector interruptVector = new InterruptVector(); // Interrupt Vector, not been used yet
     public static int PCBCounter = 1; // PCB Counter, used to allocate PCBID, should be modified to a better version.
     public static MMUController controller; // MMU Controller
@@ -29,17 +31,12 @@ public class Main {
     public static Scheduler scheduler; // Task Scheduler
     public static Interpreter interpret; // SOS Assembly Interpreter, or Software CPU
     public static FileTree FS;
-    public static DeviceTable deviceTable;
+    public static StdDevice stdDevice;
 
     public static PCB CurrentProcess = null;
-    public static String GetPhysicalMemory() {
-        var ret = new StringBuilder();
-        for (var i = 0; i < Memory.length; i++) {
-            if (Memory[i] != null) {
-                ret.append(String.format("[Physical Memory] Address: %d, Content: %s\n", i, Memory[i].toString()));
-            }
-        }
-        return ret.toString();
+    public static int[] GetPhysicalMemory() {
+
+        return controller.pageBitmap;
     }
     public static SOSInfo GetSOSInfo() {
         var ret = new SOSInfo();
@@ -129,7 +126,6 @@ public class Main {
     }
 
     // Called to Create A New Task
-    // TODO: Apply A Better PCBID Allocation Algorithm
     public static PCB createProcess(String[] scripts, int CPUTick, String pName) throws Exception {
         var PCBID = -1;
         for (var i = 1; i < Constants.PAGE_TABLE_NUMBER; i++) {//1到PAGE_TABLE_NUMBER?
@@ -246,8 +242,10 @@ public class Main {
         controller = mmu;
         interpret = new Interpreter(mmu);
         scheduler = new Scheduler(Tasks);
-        deviceTable = new DeviceTable();
-        DeviceTable.DeviceBuffer = new Object[DeviceTable.DeviceBufferSize];
+        stdDevice = new StdDevice();
+        DeviceTable.add(stdDevice);
+        stdDevice.DeviceName = "STDIO";
+        stdDevice.DeviceBuffer = new Object[stdDevice.DeviceBufferSize];
         SyscallHandler.Tasks = Tasks;
         SyscallHandler.Timers = new ArrayList<>();
         SyscallHandler.PageFaults = new ArrayList<>();
@@ -276,7 +274,10 @@ public class Main {
         is.close();
         var scriptsRaw = new String(buffer);
         var scripts = scriptsRaw.split("\n");
-        DeviceTable.process = createProcess(scripts, 0, "IOProcess");
+        stdDevice.process = createProcess(scripts, 0, "IOProcess");
+        stdDevice.Status= DeviceStatus.AVAILABLE;
+        stdDevice.intEntry=7;
+        stdDevice.start();
         is = Main.class.getClassLoader().getResourceAsStream("script2.txt");
         buffer = is.readAllBytes();
         is.close();
@@ -352,7 +353,6 @@ public class Main {
         // Bootstrapping. Fill the Necessary Arguments.
         System.out.println("SOS Bootstrapping ...");
         Bootstrap();
-        deviceTable.start();
         // Fetch Programs in src/resources/script.txt
 
 
@@ -362,5 +362,21 @@ public class Main {
             NextTick();
         }
 //        System.out.println(FS.FoundFile("root/home"));
+    }
+
+    public static boolean HttpInput(String deviceName, String content) {
+        for (var device : DeviceTable) {
+            if (device.DeviceName.equals(deviceName)) {
+                if(device.count<device.DeviceBufferSize){
+                    device.DeviceBuffer[device.tail++] = content;
+                    device.tail%=device.DeviceBufferSize;
+                    device.count++;
+                    device.process.RegisterCache[Constants.SP]=device.intEntry;
+                    device.process.ProcessState=PCB.State.READY;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }
