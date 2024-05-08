@@ -44,7 +44,7 @@ public class Controller {
         server.start();
     }
 
-    static class LinkFileHandle() implements HttpHandler {
+    static class LinkFileHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             var str = exchange.getRequestBody();
