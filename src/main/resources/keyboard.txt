@@ -4,5 +4,8 @@ movs, *R1, root/dev/std
 mov, R3, 0
 syscall,3
 mov, R1, R4
-mov, R2, 2147483647
+mov, R2, 128
+mov, R3, 128
+syscall,5
 syscall,6
+exit

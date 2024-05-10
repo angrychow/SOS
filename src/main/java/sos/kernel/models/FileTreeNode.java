@@ -18,8 +18,27 @@ public class FileTreeNode {
     public String DeviceName;
     public String Name;
     public FileDescriptor Link;
-    public String contents = "";
+    private String contents = "";
+
+    private final Object contentLock = new Object();
     public String FilePath = "";
+
+    public String readContents() {
+        synchronized (contentLock) {
+            return this.contents;
+        }
+    }
+
+    public void writeContents(String append) {
+        synchronized(contentLock) {
+            this.contents =  append;
+        }
+    }
+    public void appendContents(String append) {
+        synchronized(contentLock) {
+            this.contents = this.contents + append;
+        }
+    }
 
     @Override
     public String toString() {

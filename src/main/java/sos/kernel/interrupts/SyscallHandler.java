@@ -39,7 +39,7 @@ public class SyscallHandler {
                     }
                     var readable = (process.RegisterCache[Constants.R2] & 1) == 1;
                     var writable = (process.RegisterCache[Constants.R2] & 2) == 2;
-                    var cursor = process.RegisterCache[Constants.R3] >= 0 ? Math.min(process.RegisterCache[Constants.R3], node.contents.length() )  : node.contents.length();
+                    var cursor = process.RegisterCache[Constants.R3] >= 0 ? Math.min(process.RegisterCache[Constants.R3], node.readContents().length() )  : node.readContents().length();
                     process.RegisterCache[Constants.R4] = FS.OpenFile((String)path, process, readable, writable, cursor).FDID;
                 } else {
                     process.RegisterCache[Constants.R4] = -1; // Failed;
@@ -75,7 +75,7 @@ public class SyscallHandler {
                     process.RegisterCache[Constants.R4] = -1; // Failed;
                     return true;
                 }
-                FS.ReadFile(found, Math.min(found.FileNode.contents.length(), process.RegisterCache[Constants.R2]), process.RegisterCache[Constants.R3], process);
+                FS.ReadFile(found, Math.min(found.FileNode.readContents().length(), process.RegisterCache[Constants.R2]), process.RegisterCache[Constants.R3], process);
                 return false;
             }
             case 6 -> { // syscall writes. R1: fd number. R2: content addr

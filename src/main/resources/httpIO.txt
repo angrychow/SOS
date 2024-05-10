@@ -6,3 +6,4 @@ syscall,3
 mov, R1, R4
 mov, R2, 2147483647
 syscall,6
+exit

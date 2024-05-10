@@ -1,11 +1,13 @@
 package sos.kernel.device;
 
+import sos.kernel.models.FileTreeNode;
 import sos.kernel.models.PCB;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public abstract class AbstractDevice extends Thread{
+    public FileTreeNode node;
     public String DeviceName;
     public DeviceStatus Status=DeviceStatus.UNAVAILABLE;
     public  Object[] DeviceBuffer;

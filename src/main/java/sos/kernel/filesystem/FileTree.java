@@ -1,5 +1,7 @@
 package sos.kernel.filesystem;
 
+import sos.kernel.Main;
+import sos.kernel.device.AbstractDevice;
 import sos.kernel.models.*;
 
 import java.util.ArrayList;
@@ -24,14 +26,9 @@ public class FileTree {
         Dev.Name = "dev";
         Dev.Type = FileTreeNode.FileType.DIRECTORY;
         Dev.FilePath = "root/dev";
-        var Std = new FileTreeNode();
-        Std.DeviceName = "std";
-        Std.Name = "std";
-        Std.Type = FileTreeNode.FileType.DEVICES;
         Root_.Type = FileTreeNode.FileType.DIRECTORY;
         Root.Sons.add(Root_);
         Root_.Sons.add(Dev);
-        this.CreateFile("root/dev", Std);
         interruptVector = v;
     }
 
@@ -89,7 +86,18 @@ public class FileTree {
     public FileDescriptor OpenFile(String FilePath, PCB process, boolean readable, boolean writable, int cursor) {
         var node = FoundFile(FilePath);
         if (node.Type == FileTreeNode.FileType.SYMBOLIC_LINK) {
-            node = FoundFile(node.contents);
+            node = FoundFile(node.readContents());
+        }
+        if (node.Type == FileTreeNode.FileType.DEVICES) {
+            AbstractDevice device = null;
+            for(var d : Main.DeviceTable) {
+                if(d.DeviceName.equals(node.DeviceName)) {
+                    device = d;
+                }
+            }
+            if(device == null) return null;
+            if(device.process != null) return null;
+            device.process = process;
         }
         if (node.Link != null) return null;
         node.Link = new FileDescriptor();
@@ -105,6 +113,17 @@ public class FileTree {
 
     public boolean CloseFile(FileDescriptor FD) {
         FD.FileNode.Link = null;
+        var node = FD.FileNode;
+        if (node.Type == FileTreeNode.FileType.DEVICES) {
+            AbstractDevice device = null;
+            for(var d : Main.DeviceTable) {
+                if(d.DeviceName.equals(node.DeviceName)) {
+                    device = d;
+                }
+            }
+            if(device == null) return false;
+            device.process = null;
+        }
         return FDTable.remove(FD);
     }
 
@@ -123,7 +142,8 @@ public class FileTree {
         if (node!=null&&node.Type == FileTreeNode.FileType.SYMBOLIC_LINK) {
             var node2=FoundFile(FilePath1);
             if(node2!=null){
-                node.contents = FilePath1;
+                node.readContents();
+                node.writeContents(FilePath1);
                 return true;
             }
         }

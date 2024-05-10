@@ -20,21 +20,21 @@ public class StdDevice extends AbstractDevice {
     }
     @Override
     public void LoadDriver() throws Exception {
-        var is = Main.class.getClassLoader().getResourceAsStream("keyboard.txt");
-        var buffer = is.readAllBytes();
-        is.close();
-        var scriptsRaw = new String(buffer);
-        var scripts = scriptsRaw.split("\n");
-        process = createProcess(scripts, cputick, "IOProcess");
+//        var is = Main.class.getClassLoader().getResourceAsStream("keyboard.txt");
+//        var buffer = is.readAllBytes();
+//        is.close();
+//        var scriptsRaw = new String(buffer);
+//        var scripts = scriptsRaw.split("\n");
+        process = null;
         Status= DeviceStatus.AVAILABLE;
-        intEntry=7;
+//        intEntry=7;
         DeviceBufferSize=64;
         DeviceBuffer=new Object[DeviceBufferSize];
-        var Std = new FileTreeNode();
-        Std.DeviceName = "std";
-        Std.Name = "std";
-        Std.Type = FileTreeNode.FileType.DEVICES;
-        FS.CreateFile("root/dev",Std);
+        this.node = new FileTreeNode();
+        this.node.DeviceName = "std";
+        this.node.Name = "std";
+        this.node.Type = FileTreeNode.FileType.DEVICES;
+        FS.CreateFile("root/dev",this.node);
         DeviceTable.add(this);
     }
     @Override
@@ -46,15 +46,11 @@ public class StdDevice extends AbstractDevice {
             throw new RuntimeException(e);
         }
         while(true) {
-            if(count<DeviceBufferSize && scanner.hasNext()){
-                DeviceBuffer[tail++] = scanner.next();
-                tail%=DeviceBufferSize;
-                count++;
-                process.RegisterCache[Constants.SP]=intEntry;
-                process.ProcessState=PCB.State.READY;
+            if(scanner.hasNext()) {
+                node.appendContents(scanner.next());
             }
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

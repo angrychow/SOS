@@ -24,7 +24,7 @@ public class HttpDevice1 extends AbstractDevice{
         is.close();
         var scriptsRaw = new String(buffer);
         var scripts = scriptsRaw.split("\n");
-        process = createProcess(scripts, cputick, "HttpIOProcess");
+//        process = createProcess(scripts, cputick, "HttpIOProcess");
         Status= DeviceStatus.AVAILABLE;
         DeviceBufferSize=64;
         DeviceBuffer=new Object[DeviceBufferSize];

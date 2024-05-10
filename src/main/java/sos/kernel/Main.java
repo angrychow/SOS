@@ -68,18 +68,15 @@ public class Main {
     ) {
         var f = new FileTreeNode();
         f.Name = filename;
-        if (filetype.equals("FILE")) {
-            f.Type = FileTreeNode.FileType.FILE;
-        } else if (filetype.equals("DIRECTORY")) {
-            f.Type = FileTreeNode.FileType.DIRECTORY;
-        } else if (filetype.equals("SYMBOLIC_LINK")) {
-            f.Type = FileTreeNode.FileType.SYMBOLIC_LINK;
-        }
-         else {
-            f.Type = FileTreeNode.FileType.DEVICES;
+        switch (filetype) {
+            case "FILE" -> f.Type = FileTreeNode.FileType.FILE;
+            case "DIRECTORY" -> f.Type = FileTreeNode.FileType.DIRECTORY;
+            case "SYMBOLIC_LINK" -> f.Type = FileTreeNode.FileType.SYMBOLIC_LINK;
+            default -> f.Type = FileTreeNode.FileType.DEVICES;
         }
         f.DeviceName = deviceName;
-        f.contents = content;
+         f.writeContents(content);
+//        f.contents = content;
         return FS.CreateFile(path, f);
     }
 
@@ -122,8 +119,8 @@ public class Main {
             while (interruptIterator.hasNext()) {
                 var rwi = interruptIterator.next();
                 System.out.println(rwi);
-                IO.IOService(rwi, controller, cputick);
-                interruptIterator.remove();
+                var res = IO.IOService(rwi, controller, cputick);
+                if(res) interruptIterator.remove();
             }
         }
     }
@@ -247,8 +244,9 @@ public class Main {
         scheduler = new Scheduler(Tasks);
         stdDevice = new StdDevice();
         DeviceTable.add(stdDevice);
-        stdDevice.DeviceName = "STDIO";
+        stdDevice.DeviceName = "std";
         stdDevice.DeviceBuffer = new Object[stdDevice.DeviceBufferSize];
+        stdDevice.LoadDriver();
         SyscallHandler.Tasks = Tasks;
         SyscallHandler.Timers = new ArrayList<>();
         SyscallHandler.PageFaults = new ArrayList<>();
@@ -277,22 +275,22 @@ public class Main {
         is.close();
         var scriptsRaw = new String(buffer);
         var scripts = scriptsRaw.split("\n");
-        stdDevice.process = createProcess(scripts, 0, "IOProcess");
+        createProcess(scripts, 0, "IOProcess");
         stdDevice.Status= DeviceStatus.AVAILABLE;
-        stdDevice.intEntry=7;
+//        stdDevice.intEntry=7;
         stdDevice.start();
-        is = Main.class.getClassLoader().getResourceAsStream("script2.txt");
-        buffer = is.readAllBytes();
-        is.close();
-        scriptsRaw = new String(buffer);
-        scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0, "Process1");
-        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
-        buffer = is.readAllBytes();
-        is.close();
-        scriptsRaw = new String(buffer);
-        scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0, "Process2");
+//        is = Main.class.getClassLoader().getResourceAsStream("script2.txt");
+//        buffer = is.readAllBytes();
+//        is.close();
+//        scriptsRaw = new String(buffer);
+//        scripts = scriptsRaw.split("\n");
+//        createProcess(scripts, 0, "Process1");
+//        is = Main.class.getClassLoader().getResourceAsStream("script3.txt");
+//        buffer = is.readAllBytes();
+//        is.close();
+//        scriptsRaw = new String(buffer);
+//        scripts = scriptsRaw.split("\n");
+//        createProcess(scripts, 0, "Process2");
         cputick = 1;
     }
 
@@ -326,21 +324,22 @@ public class Main {
                 if (p != null) {
                     p.ProcessState = PCB.State.RUNNING;
                     CurrentProcess = p;
-                } else {
-                    while (p == null) {
-                        p = scheduler.Schedule(cputick);
-                        cputick++;
-//                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
-                        if (Tasks.isEmpty()) {
-                            break;
-                        }
-                        CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
-                    }
-                    if (p != null) {
-                        CurrentProcess = p;
-                        p.ProcessState = PCB.State.RUNNING;
-                    }
                 }
+//                else {
+//                    while (p == null) {
+//                        p = scheduler.Schedule(cputick);
+//                        cputick++;
+////                        System.out.printf("[IDLE] CPU Tick:%d\n", cputick);
+//                        if (Tasks.isEmpty()) {
+//                            break;
+//                        }
+//                        CheckAllInterrupt(); // when idle, only cpu tick++ and check interrupt. corner cases.
+//                    }
+//                    if (p != null) {
+//                        CurrentProcess = p;
+//                        p.ProcessState = PCB.State.RUNNING;
+//                    }
+//                }
             }
             if (!interrupted) CheckAllInterrupt(); // Interrupt Cycle.
             return interruptVector.LastExecCommand;
@@ -370,13 +369,7 @@ public class Main {
     public static boolean HttpInput(String deviceName, String content) {
         for (var device : DeviceTable) {
             if (device.DeviceName.equals(deviceName)) {
-                if(device.count<device.DeviceBufferSize){
-                    device.DeviceBuffer[device.tail++] = content;
-                    device.tail%=device.DeviceBufferSize;
-                    device.count++;
-                    device.process.RegisterCache[Constants.SP]=device.intEntry;
-                    device.process.ProcessState=PCB.State.READY;
-                }
+                device.node.appendContents(content);
                 return true;
             }
         }
