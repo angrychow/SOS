@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SOS:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SOS_jar</output-path>
+    <root id="archive" name="SOS.jar">
+      <element id="module-output" name="SOS" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/alibaba/fastjson2/fastjson2-extension/2.0.31/fastjson2-extension-2.0.31.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/alibaba/fastjson2/fastjson2/2.0.31/fastjson2-2.0.31.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/alibaba/fastjson/2.0.31/fastjson-2.0.31.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
