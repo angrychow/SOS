@@ -9,32 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/asset-manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/main.aaa049b4.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/main.aaa049b4.css.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/favicon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/453.8c146d6f.chunk.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/453.8c146d6f.chunk.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/main.8b2eb89e.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/main.8b2eb89e.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PageEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PageEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/keyboard.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/keyboard.txt" afterDir="false" />
-    </list>
+    <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -156,7 +131,7 @@
       <workItem from="1713428387185" duration="250000" />
       <workItem from="1713597006881" duration="864000" />
       <workItem from="1715244319928" duration="503000" />
-      <workItem from="1715324501407" duration="41203000" />
+      <workItem from="1715324501407" duration="41230000" />
     </task>
     <servers />
   </component>
