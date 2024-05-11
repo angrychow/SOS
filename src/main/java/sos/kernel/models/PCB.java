@@ -1,5 +1,6 @@
 package sos.kernel.models;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import sos.kernel.Constants;
 
 import java.util.Arrays;
@@ -27,6 +28,7 @@ public class PCB {
     public String ProcessName;
     public int WaitingTick=0;
 
+    @JSONField(serialize = false)
     public boolean isTerminated() throws Exception {
         Object temp=controller.MemoryRead(this,RegisterCache[Constants.SP],cputick);
         if(this.IntPageFault)

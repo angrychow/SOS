@@ -4,15 +4,21 @@ import com.alibaba.fastjson2.JSON;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import sos.kernel.Main;
 import sos.kernel.device.DeviceStatus;
 import sos.kernel.device.HttpDevice1;
 import sos.kernel.filesystem.FileTree;
 import sos.kernel.models.FileTreeNode;
 import sos.kernel.models.MMUInfo;
+import sos.kernel.models.PCB;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -21,8 +27,12 @@ import java.util.stream.IntStream;
 import static sos.kernel.Main.*;
 
 public class Controller {
+    private static byte[] getResourceFileContent(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
     public static void main(String[] args) throws Exception {
-        sos.kernel.Main.Bootstrap();
+        Bootstrap();
         HttpDevice1 httpDevice1 = new HttpDevice1();
         httpDevice1.DeviceName = "httpdevice1";
         httpDevice1.LoadDriver();
@@ -37,9 +47,31 @@ public class Controller {
         server.createContext("/api/create", new CreateFileHandle());
         server.createContext("/api/delete", new DeleteFileHandle());
         server.createContext("/api/link",new LinkFileHandle());
-        server.createContext("/api/MMU_info", new MMUInfoHandle());
+        server.createContext("/api/mmu_info", new MMUInfoHandle());
         server.createContext("/api/device_table", new DevicesHandle());
         server.createContext("/api/http_input", new HttpInputHandle());
+        // 设置根URL的处理程序
+        server.createContext("/", exchange -> {
+            String filePath = "index.html";
+            InputStream inputStream = Controller.class.getClassLoader().getResourceAsStream(filePath);
+            byte[] response = inputStream.readAllBytes();
+            exchange.sendResponseHeaders(200, response.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response);
+            os.close();
+        });
+
+        // 设置/static/* URL的处理程序
+        server.createContext("/static/", exchange -> {
+            String filePath = exchange.getRequestURI().getPath().substring(1);
+            InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(filePath);
+            byte[] response = inputStream.readAllBytes();
+            exchange.sendResponseHeaders(200, response.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response);
+            os.close();
+        });
+
         server.setExecutor(Executors.newFixedThreadPool(1));
         server.start();
     }
@@ -67,15 +99,21 @@ public class Controller {
     static class DevicesHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            var devices = DeviceTable;
-            Map<String, DeviceStatus> deviceStatusMap = devices.stream()
-                    .collect(Collectors.toMap(i->i.DeviceName, i->i.Status));
-            var str = JSON.toJSONString(deviceStatusMap);
-            exchange.getResponseHeaders().set("Content-Type", "application/json");
-            exchange.sendResponseHeaders(200, str.getBytes().length);
-            OutputStream outputStream = exchange.getResponseBody();
-            outputStream.write(str.getBytes());
-            outputStream.close();
+            try {
+                var devices = DeviceTable;
+                Map<String, DeviceStatus> deviceStatusMap = devices.stream()
+                        .collect(Collectors.toMap(i->i.DeviceName, i->i.Status));
+                var str = JSON.toJSONString(deviceStatusMap);
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, str.getBytes().length);
+                OutputStream outputStream = exchange.getResponseBody();
+                outputStream.write(str.getBytes());
+                outputStream.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                throw e;
+            }
+
         }
     }
 
@@ -85,7 +123,7 @@ public class Controller {
         public void handle(HttpExchange exchange) throws IOException {
             int[] pageBitmap;
             try {
-                pageBitmap = sos.kernel.Main.GetPhysicalMemory();
+                pageBitmap = GetPhysicalMemory();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -108,7 +146,7 @@ public class Controller {
         public void handle(HttpExchange exchange) throws IOException {
             var str = "";
             try {
-                str = sos.kernel.Main.NextTick();
+                str = NextTick();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -129,14 +167,20 @@ public class Controller {
             Map<String, Object> body = JSON.parseObject(str);
             var script = body.get("script");
             var pname = body.get("name");
+            var priority = (String) body.get("priority");
             System.out.println(script);
-            var ok = false;
+            PCB p;
             try {
-                ok = sos.kernel.Main.CreateProcess((String) script, (String) pname);
+                p = CreateProcess((String) script, (String) pname);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            String response = ok ? "OK" :"Not OK";
+            switch (priority) {
+                case "HIGH" -> p.Priority = PCB.HIGH;
+                case "LOW" -> p.Priority = PCB.LOW;
+                default -> p.Priority = PCB.MEDIUM;
+            }
+            String response = p != null ? "OK" :"Not OK";
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream outputStream = exchange.getResponseBody();
             outputStream.write(response.getBytes());
@@ -152,7 +196,7 @@ public class Controller {
             var content = (String) body.get("content");
             var ok = false;
             try {
-                ok = sos.kernel.Main.HttpInput(deviceName, content);
+                ok = HttpInput(deviceName, content);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -167,7 +211,7 @@ public class Controller {
     static class InfoHandle implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            var obj = sos.kernel.Main.GetSOSInfo();
+            var obj = GetSOSInfo();
             var str = JSON.toJSONString(obj);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, str.getBytes().length);
@@ -186,7 +230,7 @@ public class Controller {
             var deviceName = (String) body.get("deviceName");
             var content = (String) body.get("content");
             var path = (String) body.get("path");
-            var response = sos.kernel.Main.CreateFile(filename, filetype, deviceName, content, path) ? "OK" : "Not OK";
+            var response = CreateFile(filename, filetype, deviceName, content, path) ? "OK" : "Not OK";
             if(response.equals("OK"))exchange.sendResponseHeaders(200, response.getBytes().length);
             else exchange.sendResponseHeaders(400, response.getBytes().length);
             OutputStream outputStream = exchange.getResponseBody();
@@ -203,7 +247,7 @@ public class Controller {
             var filepath = (String) body.get("path");
             var ok = false;
             try {
-                ok = sos.kernel.Main.DeleteFile(filepath);
+                ok = DeleteFile(filepath);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -223,7 +267,7 @@ public class Controller {
             var filepath = (String) body.get("path");
             FileTreeNode obj;
             try {
-                obj = sos.kernel.Main.FoundFile(filepath);
+                obj = FoundFile(filepath);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

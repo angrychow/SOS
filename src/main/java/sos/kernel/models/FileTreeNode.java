@@ -18,7 +18,7 @@ public class FileTreeNode {
     public String DeviceName;
     public String Name;
     public FileDescriptor Link;
-    private String contents = "";
+    public String contents = "";
 
     private final Object contentLock = new Object();
     public String FilePath = "";

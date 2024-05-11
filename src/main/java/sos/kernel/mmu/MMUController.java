@@ -32,6 +32,7 @@ public class MMUController {
         swappedPages = new ArrayList<>(); // 用于存放被换出的页面
         pagesStart = pageTableSize * Constants.PAGE_TABLE_NUMBER; //页表项最多能有PAGE_TABLE_NUMBER个进程
         interruptVector = vector;
+        System.out.printf("[System Page Size]: %d pages \n", phyPageSize);
     }
 
     private int foundEmptyPage(PCB nowPCB, int CPUTick) throws Exception {
@@ -89,9 +90,8 @@ public class MMUController {
 
     public Double MemoryUsage() {
         int used=0;
-        for(int i=0;i<Memory.length; i++)
-        {
-            if(Memory[i]!=null)
+        for (Object o : Memory) {
+            if (o != null)
                 used++;
         }
         return (double)used/Memory.length;
@@ -100,12 +100,12 @@ public class MMUController {
         int virPage = page(virtualAddress);
         int offset = offset(virtualAddress);
         PageEntry phyPageEntry = (PageEntry)(this.Memory[process.RegisterCache[Constants.CR] + virPage]);
-
         if(phyPageEntry == null || !phyPageEntry.Valid || pageBitmap[phyPageEntry.PhyPage] != process.PCBID) {
             process.IntPageFault = true;
             return false; // 中断
         } else {
             this.Memory[phyPageEntry.PhyPage * pageSize + offset] = content;
+            phyPageEntry.Dirty = true;
             pageLastVisit[phyPageEntry.PhyPage] = CPUTick;
             return true;
         }

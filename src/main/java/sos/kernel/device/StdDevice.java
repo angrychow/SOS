@@ -35,7 +35,6 @@ public class StdDevice extends AbstractDevice {
         this.node.Name = "std";
         this.node.Type = FileTreeNode.FileType.DEVICES;
         FS.CreateFile("root/dev",this.node);
-        DeviceTable.add(this);
     }
     @Override
     public void run() {

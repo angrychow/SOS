@@ -2,6 +2,7 @@ package sos.kernel.filesystem;
 
 import sos.kernel.Main;
 import sos.kernel.device.AbstractDevice;
+import sos.kernel.device.DeviceStatus;
 import sos.kernel.models.*;
 
 import java.util.ArrayList;
@@ -98,6 +99,7 @@ public class FileTree {
             if(device == null) return null;
             if(device.process != null) return null;
             device.process = process;
+            device.Status = DeviceStatus.UNAVAILABLE;
         }
         if (node.Link != null) return null;
         node.Link = new FileDescriptor();
@@ -123,6 +125,7 @@ public class FileTree {
             }
             if(device == null) return false;
             device.process = null;
+            device.Status = DeviceStatus.AVAILABLE;
         }
         return FDTable.remove(FD);
     }

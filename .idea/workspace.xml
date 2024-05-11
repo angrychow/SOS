@@ -1,15 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="SOS:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/asset-manifest.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/manifest.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/main.aaa049b4.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/css/main.aaa049b4.css.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/favicon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/453.8c146d6f.chunk.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/453.8c146d6f.chunk.js.map" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/main.8b2eb89e.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/js/main.8b2eb89e.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileDescriptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PageEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PageEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/keyboard.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/keyboard.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +77,7 @@
     "Application.Main.executor": "Run",
     "Maven.SOS [clean].executor": "Run",
     "Maven.SOS [deploy].executor": "Run",
+    "Maven.SOS [org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar].executor": "Run",
     "Maven.SOS [test].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -64,10 +89,10 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "MavenSettings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -128,6 +153,10 @@
       <workItem from="1711806361793" duration="36042000" />
       <workItem from="1712817958153" duration="13195000" />
       <workItem from="1713428252188" duration="39000" />
+      <workItem from="1713428387185" duration="250000" />
+      <workItem from="1713597006881" duration="864000" />
+      <workItem from="1715244319928" duration="503000" />
+      <workItem from="1715324501407" duration="41203000" />
     </task>
     <servers />
   </component>
@@ -155,9 +184,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/SyscallHandler.java</url>
-          <line>27</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/src/main/java/sos/http/Controller.java</url>
+          <line>55</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/sos/http/Controller.java</url>
+          <line>65</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

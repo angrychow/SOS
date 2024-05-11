@@ -8,4 +8,5 @@ mov, R2, 128
 mov, R3, 128
 syscall,5
 syscall,6
+syscall,4
 exit

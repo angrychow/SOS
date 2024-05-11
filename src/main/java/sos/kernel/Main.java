@@ -156,9 +156,9 @@ public class Main {
         return newProcess;
     }
 
-    public static boolean CreateProcess(String script, String pname) throws Exception {
+    public static PCB CreateProcess(String script, String pname) throws Exception {
         var p = createProcess(script.split("\n"), cputick, pname);
-        return p != null;
+        return p;
     }
 
     // SOS's Next Tick. Return True If There Is No Interrupt.

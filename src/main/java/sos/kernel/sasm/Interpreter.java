@@ -120,7 +120,7 @@ public class Interpreter {
             }
         } else if(contains(commands[0], JumpCommand)) {
             if(commands[0].equals("jmp")){
-                process.RegisterCache[Constants.SP] = Integer.parseInt(commands[1]);
+                process.RegisterCache[Constants.SP] = Integer.parseInt(commands[1]) - 1;
                 return true;
             }
             var leftNumber = parse2Number(commands[2], process);
