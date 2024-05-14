@@ -34,6 +34,7 @@ public class HttpDevice1 extends AbstractDevice{
         device.Name = "httpdevice1";
         device.Type = FileTreeNode.FileType.DEVICES;
         FS.CreateFile("root/dev",device);
+        node=device;
         DeviceTable.add(this);
         writer = new PrintWriter("httpdevice1.txt");
     }
