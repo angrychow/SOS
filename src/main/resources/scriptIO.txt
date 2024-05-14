@@ -2,7 +2,7 @@ movs,*3000,root
 movs,*3001,home2
 movs,*3002,TestString
 movs,*3003,root/home2
-movs,*3004,root/std
+movs,*3004,root/dev/std
 mov,R1,3000
 mov,R2,3001
 syscall,9

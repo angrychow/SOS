@@ -31,7 +31,10 @@ public class FileTreeNode {
 
     public void writeContents(String append) {
         synchronized(contentLock) {
-            this.contents =  append;
+            if(append == null)
+                this.contents = "";
+            else
+                this.contents =  append;
         }
     }
     public void appendContents(String append) {

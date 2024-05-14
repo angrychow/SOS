@@ -15,6 +15,7 @@ import static sos.kernel.Main.*;
 public class StdDevice extends AbstractDevice {
     @Override
     public   void PrintToOUT(String content) {
+        System.out.println("[Message Received]: " + content);
         writer.print(content);
         writer.flush();
     }

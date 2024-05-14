@@ -147,7 +147,7 @@ public class Main {
         for (var i = 0; i < scripts.length; i++) {
             controller.MemoryWrite(newProcess, i, scripts[i], CPUTick);
             if (newProcess.IntPageFault) {
-                controller.PageReenter(newProcess, newProcess.IntVirAddr, CPUTick);
+                controller.PageReenter(newProcess, i, CPUTick);
                 controller.MemoryWrite(newProcess, i, scripts[i], CPUTick);
                 newProcess.IntPageFault = false;
             }
@@ -167,14 +167,15 @@ public class Main {
         // Fetch Instruction. Handle Page Fault Manually.
 
         var instruction = controller.MemoryRead(p, p.RegisterCache[Constants.SP], cputick++);
-        if (!instruction.getClass().equals(String.class)) {
-//            throw new Exception("Error While Reading Instruction");
-            p.ProcessState = PCB.State.WAITING;
-            return true;
+        if (!instruction.getClass().equals(String.class) && !p.IntPageFault) {
+            instruction = controller.MemoryRead(p, p.RegisterCache[Constants.SP], cputick++);
+            throw new Exception("Error While Reading Instruction");
+//            p.ProcessState = PCB.State.WAITING;
+//            return true;
         } else {
             if (p.IntPageFault) {
                 p.IntPageFault = false;
-                controller.PageReenter(p, p.IntVirAddr, cputick++);
+                controller.PageReenter(p, p.RegisterCache[Constants.SP], cputick++);
                 instruction = controller.MemoryRead(p, p.RegisterCache[Constants.SP], cputick++);
             }
 
@@ -270,12 +271,12 @@ public class Main {
 //        scriptsRaw = new String(buffer);
 //        scripts = scriptsRaw.split("\n");
 //        createProcess(scripts, 0, "Process2");
-        var is = Main.class.getClassLoader().getResourceAsStream("keyboard.txt");
-        var buffer = is.readAllBytes();
-        is.close();
-        var scriptsRaw = new String(buffer);
-        var scripts = scriptsRaw.split("\n");
-        createProcess(scripts, 0, "IOProcess");
+//        var is = Main.class.getClassLoader().getResourceAsStream("keyboard.txt");
+//        var buffer = is.readAllBytes();
+//        is.close();
+//        var scriptsRaw = new String(buffer);
+//        var scripts = scriptsRaw.split("\n");
+//        createProcess(scripts, 0, "IOProcess");
         stdDevice.Status= DeviceStatus.AVAILABLE;
 //        stdDevice.intEntry=7;
         stdDevice.start();

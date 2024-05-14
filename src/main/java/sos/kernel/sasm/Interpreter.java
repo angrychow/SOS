@@ -40,7 +40,7 @@ public class Interpreter {
     }
 
     static int parse2Number(String cmd, PCB process) throws Exception {
-        if(Numbers.contains(String.valueOf(cmd.charAt(0)))) {
+        if(Numbers.contains(String.valueOf(cmd.charAt(0))) || cmd.charAt(0) == '-') {
             return Integer.parseInt(cmd);
         } else {
             int r = parseOnlyRegister(cmd);
@@ -135,7 +135,7 @@ public class Interpreter {
                 default -> throw new Exception("Comparing Error");
             };
             if(flag) {
-                process.RegisterCache[Constants.SP] = Integer.parseInt(commands[1]);
+                process.RegisterCache[Constants.SP] = Integer.parseInt(commands[1]) - 1;
             }
             return true;
         } else if(contains(commands[0], InterruptCommand)) {

@@ -81,7 +81,7 @@ public class MMUController {
         pageBitmap[swappedIndex] = nowPCB.PCBID;
         pageLastVisit[swappedIndex] = CPUTick;
         // 页面加入 Swapped Pages Pool
-        swappedPages.add(new SwappedOutPage(pageBitmap[swappedIndex], swappedVirPage, contents));
+        swappedPages.add(new SwappedOutPage(task.PCBID, swappedVirPage, contents));
         return swappedIndex;
     }
 
@@ -89,7 +89,7 @@ public class MMUController {
     private int offset(int addr) { return addr % pageSize; }
 
     public Double MemoryUsage() {
-        int used=0;
+        int used = 0;
         for (Object o : Memory) {
             if (o != null)
                 used++;
