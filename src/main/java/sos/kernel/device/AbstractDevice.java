@@ -31,4 +31,8 @@ public abstract class AbstractDevice extends Thread{
     }
     public abstract void LoadDriver() throws Exception;
 
+    public String getDeviceName() {
+        return DeviceName;
+    }
+
 }

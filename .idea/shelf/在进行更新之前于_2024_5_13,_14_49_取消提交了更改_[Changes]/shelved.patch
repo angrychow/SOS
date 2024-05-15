@@ -1,0 +1,106 @@
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_21\" default=\"true\" project-jdk-name=\"21\" project-jdk-type=\"JavaSDK\">\n    <output url=\"file://$PROJECT_DIR$/out\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 7c59b56ee4ca972e49a883b740493d0705602536)
++++ b/.idea/misc.xml	(date 1713417468827)
+@@ -7,6 +7,7 @@
+         <option value="$PROJECT_DIR$/pom.xml" />
+       </list>
+     </option>
++    <option name="workspaceImportForciblyTurnedOn" value="true" />
+   </component>
+   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"a6815e66-e9a1-488a-ab47-a6b6e78bedb3\" name=\"Changes\" comment=\"\">\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/sos/http/Constants.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/sos/http/Controller.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/SOSInfo.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/pom.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/pom.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/Main.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/Main.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Class\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"JsbtTreeLayoutManager\">\n    <layout place=\"tools.popupGrunt\">\n      <scroll-view-position x=\"0\" y=\"0\" />\n    </layout>\n  </component>\n  <component name=\"KubernetesApiProvider\">{\n  &quot;isMigrated&quot;: true\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;customColor&quot;: &quot;&quot;,\n  &quot;associatedIndex&quot;: 1\n}</component>\n  <component name=\"ProjectId\" id=\"2eGPToKhog8MrdnBAX5TziLhhY1\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.Controller.executor\": \"Run\",\n    \"Application.Main.executor\": \"Run\",\n    \"Maven.SOS [clean].executor\": \"Run\",\n    \"Maven.SOS [deploy].executor\": \"Run\",\n    \"Maven.SOS [test].executor\": \"Run\",\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"git-widget-placeholder\": \"main\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"project.structure.last.edited\": \"Modules\",\n    \"project.structure.proportion\": \"0.0\",\n    \"project.structure.side.proportion\": \"0.0\",\n    \"settings.editor.selected.configurable\": \"preferences.lookFeel\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RunManager\" selected=\"Application.Controller\">\n    <configuration name=\"Controller\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"sos.http.Controller\" />\n      <module name=\"SOS\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"sos.http.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"sos.kernel.Main\" />\n      <module name=\"SOS\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"sos.kernel.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Controller\" />\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"a6815e66-e9a1-488a-ab47-a6b6e78bedb3\" name=\"Changes\" comment=\"\" />\n      <created>1711527953067</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1711527953067</updated>\n      <workItem from=\"1711527954732\" duration=\"32387000\" />\n      <workItem from=\"1711632064165\" duration=\"16878000\" />\n      <workItem from=\"1711696919456\" duration=\"16406000\" />\n      <workItem from=\"1711771488457\" duration=\"17497000\" />\n      <workItem from=\"1711791360185\" duration=\"37000\" />\n      <workItem from=\"1711806361793\" duration=\"36042000\" />\n    </task>\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"CUSTOM_BOOLEAN_PROPERTIES\">\n                <map>\n                  <entry key=\"Show.Git.Branches\" value=\"false\" />\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 7c59b56ee4ca972e49a883b740493d0705602536)
++++ b/.idea/workspace.xml	(date 1713428450117)
+@@ -5,18 +5,8 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
+-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Constants.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/http/Controller.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/SOSInfo.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Constants.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/filesystem/FileTree.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/InterruptVector.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/PCB.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -27,6 +17,7 @@
+     <option name="RECENT_TEMPLATES">
+       <list>
+         <option value="Class" />
++        <option value="UML Class" />
+       </list>
+     </option>
+   </component>
+@@ -55,6 +46,7 @@
+   "keyToString": {
+     "Application.Controller.executor": "Run",
+     "Application.Main.executor": "Run",
++    "DefaultPlantUmlFileTemplate": "UML Class",
+     "Maven.SOS [clean].executor": "Run",
+     "Maven.SOS [deploy].executor": "Run",
+     "Maven.SOS [test].executor": "Run",
+@@ -63,6 +55,7 @@
+     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+     "git-widget-placeholder": "main",
+     "kotlin-language-version-configured": "true",
++    "last_opened_file_path": "/Users/xiexinxin/code/SOS",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+     "node.js.selected.package.eslint": "(autodetect)",
+@@ -71,11 +64,11 @@
+     "project.structure.last.edited": "Modules",
+     "project.structure.proportion": "0.0",
+     "project.structure.side.proportion": "0.0",
+-    "settings.editor.selected.configurable": "preferences.lookFeel",
++    "settings.editor.selected.configurable": "preferences.keymap",
+     "vue.rearranger.settings.migration": "true"
+   }
+ }]]></component>
+-  <component name="RunManager" selected="Application.Controller">
++  <component name="RunManager" selected="应用程序.Controller">
+     <configuration name="Controller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="sos.http.Controller" />
+       <module name="SOS" />
+@@ -102,19 +95,6 @@
+         <option name="Make" enabled="true" />
+       </method>
+     </configuration>
+-    <recent_temporary>
+-      <list>
+-        <item itemvalue="Application.Controller" />
+-        <item itemvalue="Application.Main" />
+-      </list>
+-    </recent_temporary>
+-  </component>
+-  <component name="SharedIndexes">
+-    <attachedChunks>
+-      <set>
+-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
+-      </set>
+-    </attachedChunks>
+   </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">

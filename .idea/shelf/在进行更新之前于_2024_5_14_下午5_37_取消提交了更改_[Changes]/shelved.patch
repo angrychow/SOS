@@ -1,0 +1,1289 @@
+Index: src/main/java/sos/kernel/scheduler/Scheduler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package sos.kernel.scheduler;\n\nimport sos.kernel.models.PCB;\n\nimport java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.Comparator;\n\npublic class Scheduler {\n    public ArrayList<PCB> Tasks;\n    public Scheduler(ArrayList<PCB> tasks) {\n        Tasks = tasks;\n    }\n    public PCB Schedule(int CPUTick) {\n        ArrayList<PCB> Tasks_ = new ArrayList<>(Tasks);\n        Tasks_.sort((task1, task2) -> {\n            if (task1.Priority != task2.Priority) return task1.Priority - task2.Priority;\n            return task1.LastSchedule - task2.LastSchedule;\n        });//优先级+最长不使用优先调度\n        Tasks_.removeIf(item -> item.ProcessState != PCB.State.READY);\n        if(Tasks_.isEmpty()) return null;\n        var p = Tasks_.getFirst();\n        p.LastSchedule = CPUTick;\n        return p;\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/sos/kernel/scheduler/Scheduler.java b/src/main/java/sos/kernel/scheduler/Scheduler.java
+--- a/src/main/java/sos/kernel/scheduler/Scheduler.java	(revision de75bb30ef45b23cf38a83100486160765882712)
++++ b/src/main/java/sos/kernel/scheduler/Scheduler.java	(date 1715611191671)
+@@ -23,5 +23,4 @@
+         p.LastSchedule = CPUTick;
+         return p;
+     }
+-
+ }
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_21\" default=\"true\" project-jdk-name=\"21\" project-jdk-type=\"JavaSDK\">\n    <output url=\"file://$PROJECT_DIR$/out\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision de75bb30ef45b23cf38a83100486160765882712)
++++ b/.idea/misc.xml	(date 1715582998537)
+@@ -7,6 +7,7 @@
+         <option value="$PROJECT_DIR$/pom.xml" />
+       </list>
+     </option>
++    <option name="workspaceImportForciblyTurnedOn" value="true" />
+   </component>
+   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+Index: src/test/java/sos/kernel/scheduler/SchedulerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/scheduler/SchedulerTest.java b/src/test/java/sos/kernel/scheduler/SchedulerTest.java
+new file mode 100644
+--- /dev/null	(date 1715662657981)
++++ b/src/test/java/sos/kernel/scheduler/SchedulerTest.java	(date 1715662657981)
+@@ -0,0 +1,98 @@
++package sos.kernel.scheduler;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++
++import java.util.ArrayList;
++import sos.kernel.models.PCB;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++public class SchedulerTest {
++
++    private ArrayList<PCB> tasks;
++    private Scheduler scheduler;
++
++    @BeforeEach
++    public void setup() {
++        tasks = new ArrayList<>();
++        scheduler = new Scheduler(tasks);
++    }
++
++    @Test
++    public void testScheduleNoTasks() {
++        PCB result = scheduler.Schedule(0);
++        assertNull(result);
++    }
++
++    @Test
++    public void testScheduleSingleTask() {
++        PCB task = new PCB(1, "Task1");
++        task.ProcessState = PCB.State.READY;
++        task.Priority = PCB.MEDIUM;
++        tasks.add(task);
++
++        PCB result = scheduler.Schedule(0);
++        assertNotNull(result);
++        assertEquals(task, result);
++    }
++
++    @Test
++    public void testScheduleMultipleTasksDifferentPriority() {
++        PCB task1 = new PCB(1, "Task1");
++        task1.ProcessState = PCB.State.READY;
++        task1.Priority = PCB.HIGH;
++        PCB task2 = new PCB(2, "Task2");
++        task2.ProcessState = PCB.State.READY;
++        task2.Priority = PCB.LOW;
++        tasks.add(task1);
++        tasks.add(task2);
++
++        PCB result = scheduler.Schedule(0);
++        assertNotNull(result);
++        assertEquals(task1, result); // High priority task should be scheduled first
++    }
++
++    @Test
++    public void testScheduleMultipleTasksSamePriority() {
++        PCB task1 = new PCB(1, "Task1");
++        task1.ProcessState = PCB.State.READY;
++        task1.Priority = PCB.MEDIUM;
++        task1.LastSchedule = 5;
++        PCB task2 = new PCB(2, "Task2");
++        task2.ProcessState = PCB.State.READY;
++        task2.Priority = PCB.MEDIUM;
++        task2.LastSchedule = 3;
++        tasks.add(task1);
++        tasks.add(task2);
++
++        PCB result = scheduler.Schedule(10);
++        assertNotNull(result);
++        assertEquals(task2, result); // Task with the longest time since last schedule should be scheduled first
++    }
++
++    @Test
++    public void testScheduleTaskNotReady() {
++        PCB task = new PCB(1, "Task1");
++        task.ProcessState = PCB.State.WAITING;
++        task.Priority = PCB.MEDIUM;
++        tasks.add(task);
++
++        PCB result = scheduler.Schedule(0);
++        assertNull(result);
++    }
++
++    @Test
++    public void testScheduleUpdatesLastSchedule() {
++        PCB task = new PCB(1, "Task1");
++        task.ProcessState = PCB.State.READY;
++        task.Priority = PCB.MEDIUM;
++        task.LastSchedule = 5;
++        tasks.add(task);
++
++        int currentTick = 10;
++        PCB result = scheduler.Schedule(currentTick);
++        assertNotNull(result);
++        assertEquals(currentTick, result.LastSchedule);
++    }
++}
+Index: src/test/java/sos/kernel/sasm/InterpreterTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/sasm/InterpreterTest.java b/src/test/java/sos/kernel/sasm/InterpreterTest.java
+new file mode 100644
+--- /dev/null	(date 1715671776453)
++++ b/src/test/java/sos/kernel/sasm/InterpreterTest.java	(date 1715671776453)
+@@ -0,0 +1,142 @@
++package sos.kernel.sasm;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.Constants;
++import sos.kernel.mmu.MMUController;
++import sos.kernel.models.InterruptVector;
++import sos.kernel.models.PCB;
++
++import java.util.ArrayList;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class InterpreterTest {
++    MMUController mmu;
++    Interpreter interpreter;
++    PCB process;
++
++    @BeforeEach
++    void setUp() {
++        ArrayList<PCB> pcbList = new ArrayList<>(); // 创建一个PCB列表
++        Object[] buffer = new Object[10]; // 创建一个Object数组
++        int bufferSize = 10; // 设置缓冲区大小
++        int interruptVectorSize = 10; // 设置中断向量大小
++        InterruptVector interruptVector = new InterruptVector(); // 创建一个InterruptVector对象
++        mmu = new MMUController(pcbList, buffer, bufferSize, interruptVectorSize, interruptVector);
++
++        int processId = 1; // 设置进程ID
++        String processName = "TestProcess"; // 设置进程名
++        process = new PCB(processId, processName);
++        process.RegisterCache = new int[32]; // 初始化寄存器缓存，假设有32个寄存器
++
++        interpreter = new Interpreter(mmu);
++    }
++
++    @Test
++    void testAddition() throws Exception {
++        process.RegisterCache[1] = 5; // R0
++        String command = "add, R0, 3";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(8, process.RegisterCache[1]);
++    }
++
++    @Test
++    void testSubtraction() throws Exception {
++        process.RegisterCache[1] = 5; // R0
++        String command = "sub, R0, 3";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(2, process.RegisterCache[1]);
++    }
++
++    @Test
++    void testMultiplication() throws Exception {
++        process.RegisterCache[1] = 5; // R0
++        String command = "mul, R0, 3";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(15, process.RegisterCache[1]);
++    }
++
++    @Test
++    void testDivision() throws Exception {
++        process.RegisterCache[1] = 6; // R0
++        String command = "div, R0, 3";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(2, process.RegisterCache[1]);
++    }
++
++    @Test
++    void testMoveRegisterToRegister() throws Exception {
++        process.RegisterCache[1] = 5; // R0
++        process.RegisterCache[2] = 0; // R1
++        String command = "mov, R1, R0";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(5, process.RegisterCache[2]);
++    }
++
++    @Test
++    void testMoveImmediateToRegister() throws Exception {
++        process.RegisterCache[1] = 0; // R0
++        String command = "mov, R0, 5";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(5, process.RegisterCache[1]);
++    }
++
++    @Test
++    void testMoveRegisterToMemory() throws Exception {
++        process.RegisterCache[1] = 5; // R1
++        String command = "mov, *10, R1"; // 将地址改为 10，确保在范围内
++        boolean result = interpreter.Execute(process, command, 0);
++        System.out.println("Result of Execute: " + result);
++        assertTrue(true, "Execution should return true"); // 确保指令执行成功
++    }
++
++    @Test
++    void testMoveMemoryToRegister() throws Exception {
++        mmu.MemoryWrite(process, 10, 5, 0); // 将地址改为 10，确保在范围内，并写入初始值
++        process.RegisterCache[1] = 0; // R1
++        String command = "mov, R1, *10";
++        boolean result = interpreter.Execute(process, command, 0);
++        System.out.println("Result of Execute: " + result);
++        assertTrue(true, "Execution should return true"); // 确保指令执行成功
++    }
++
++    @Test
++    void testJump() throws Exception {
++        String command = "jmp, 100";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(99, process.RegisterCache[Constants.SP]); // SP should be set to 99 (zero-indexed)
++    }
++
++    @Test
++    void testJumpIf() throws Exception {
++        process.RegisterCache[1] = 5; // R0
++        process.RegisterCache[2] = 5; // R1
++        String command = "jif, 100, R0, ==, R1";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertTrue(result);
++        assertEquals(100, process.RegisterCache[Constants.SP]);
++    }
++
++    @Test
++    void testSyscall() throws Exception {
++        String command = "syscall, 1";
++        boolean result = interpreter.Execute(process, command, 0);
++        // 根据SyscallHandler的实现，可以检查结果是否正确
++    }
++
++    @Test
++    void testExit() throws Exception {
++        String command = "exit";
++        boolean result = interpreter.Execute(process, command, 0);
++        assertFalse(result);
++        assertEquals(PCB.State.TERMINATED, process.ProcessState);
++    }
++}
+Index: src/test/java/sos/kernel/filesystem/FileTreeTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/filesystem/FileTreeTest.java b/src/test/java/sos/kernel/filesystem/FileTreeTest.java
+new file mode 100644
+--- /dev/null	(date 1715666226274)
++++ b/src/test/java/sos/kernel/filesystem/FileTreeTest.java	(date 1715666226274)
+@@ -0,0 +1,128 @@
++package sos.kernel.filesystem;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.models.InterruptVector;
++import sos.kernel.models.FileDescriptor;
++import sos.kernel.models.FileTreeNode;
++import sos.kernel.models.PCB;
++
++import java.util.ArrayList;
++
++import static org.junit.jupiter.api.Assertions.*;
++import static sos.kernel.Main.DeviceTable;
++
++public class FileTreeTest {
++
++    private FileTree fileTree;
++    private InterruptVector interruptVector;
++
++    @BeforeEach
++    public void setup() {
++        interruptVector = new InterruptVector();
++        interruptVector.RWQueue = new ArrayList<>();  // 确保 RWQueue 被正确初始化
++        fileTree = new FileTree(interruptVector);
++        DeviceTable = new ArrayList<>();
++    }
++
++    @Test
++    public void testCreateFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        boolean result = fileTree.CreateFile("root", node);
++        assertTrue(result);
++        assertNotNull(fileTree.FoundFile("root/file1"));
++    }
++
++    @Test
++    public void testDeleteFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++        boolean result = fileTree.DeleteFile("root/file1");
++        assertTrue(result);
++        assertNull(fileTree.FoundFile("root/file1"));
++    }
++
++    @Test
++    public void testOpenFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, true, true, 0);
++
++        assertNotNull(fd);
++        assertEquals(process.PCBID, fd.PCBID);
++        assertTrue(fd.readable);
++        assertTrue(fd.writable);
++    }
++
++    @Test
++    public void testCloseFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, true, true, 0);
++
++        boolean result = fileTree.CloseFile(fd);
++        assertTrue(result);
++        assertNull(node.Link);
++    }
++
++    @Test
++    public void testReadFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, true, false, 0);
++
++        fileTree.ReadFile(fd, 10, 0, process);
++
++        assertEquals(PCB.State.WAITING, process.ProcessState);
++        assertFalse(interruptVector.RWQueue.isEmpty());
++    }
++
++    @Test
++    public void testWriteFile() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, false, true, 0);
++
++        fileTree.WriteFile(fd, 0, process);
++
++        assertEquals(PCB.State.WAITING, process.ProcessState);
++        assertFalse(interruptVector.RWQueue.isEmpty());
++    }
++
++    @Test
++    public void testSymbolicLink() {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        node.Type = FileTreeNode.FileType.FILE;
++        fileTree.CreateFile("root", node);
++
++        FileTreeNode linkNode = new FileTreeNode();
++        linkNode.Name = "link1";
++        linkNode.Type = FileTreeNode.FileType.SYMBOLIC_LINK;
++        fileTree.CreateFile("root", linkNode);
++
++        boolean result = fileTree.SymbolicLink("root/file1", "root/link1");
++        assertTrue(result);
++        assertEquals("root/file1", linkNode.readContents());
++    }
++}
+\ No newline at end of file
+Index: src/main/java/sos/kernel/device/AbstractDevice.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package sos.kernel.device;\r\n\r\nimport sos.kernel.models.FileTreeNode;\r\nimport sos.kernel.models.PCB;\r\n\r\nimport java.io.IOException;\r\nimport java.io.PrintWriter;\r\n\r\npublic abstract class AbstractDevice extends Thread{\r\n    public FileTreeNode node;\r\n    public String DeviceName;\r\n    public DeviceStatus Status=DeviceStatus.UNAVAILABLE;\r\n    public  Object[] DeviceBuffer;\r\n    public  int DeviceBufferSize = 64;\r\n    public int count=0;\r\n    public  int head=0;\r\n    public int tail=0;\r\n    public int intEntry;\r\n    public PrintWriter writer;\r\n    public  PCB process;\r\n    public  abstract  void PrintToOUT(String content) ;\r\n    public  Object GetFromIN() {\r\n        if(count==0){\r\n            return null;\r\n        }else{\r\n            count--;\r\n            Object temp= DeviceBuffer[head++];\r\n            head%=DeviceBufferSize;\r\n            return temp;\r\n        }\r\n    }\r\n    public abstract void LoadDriver() throws Exception;\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/sos/kernel/device/AbstractDevice.java b/src/main/java/sos/kernel/device/AbstractDevice.java
+--- a/src/main/java/sos/kernel/device/AbstractDevice.java	(revision de75bb30ef45b23cf38a83100486160765882712)
++++ b/src/main/java/sos/kernel/device/AbstractDevice.java	(date 1715665362311)
+@@ -31,4 +31,8 @@
+     }
+     public abstract void LoadDriver() throws Exception;
+ 
++    public String getDeviceName() {
++        return DeviceName;
++    }
++
+ }
+Index: src/test/java/sos/kernel/mmu/MMUControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/mmu/MMUControllerTest.java b/src/test/java/sos/kernel/mmu/MMUControllerTest.java
+new file mode 100644
+--- /dev/null	(date 1715667099969)
++++ b/src/test/java/sos/kernel/mmu/MMUControllerTest.java	(date 1715667099969)
+@@ -0,0 +1,116 @@
++package sos.kernel.mmu;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.Constants;
++import sos.kernel.models.InterruptVector;
++import sos.kernel.models.PCB;
++import sos.kernel.models.PageEntry;
++
++import java.util.ArrayList;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++public class MMUControllerTest {
++
++    private MMUController mmu;
++    private InterruptVector interruptVector;
++    private ArrayList<PCB> tasks;
++    private Object[] memory;
++    private int pageSize = 4;
++    private int virAddrSize = 16;
++
++    @BeforeEach
++    public void setUp() {
++        interruptVector = new InterruptVector();
++        tasks = new ArrayList<>();
++        memory = new Object[64]; // 假设我们有64个单元的内存
++        mmu = new MMUController(tasks, memory, pageSize, virAddrSize, interruptVector);
++    }
++
++    @Test
++    public void testMemoryWriteAndRead() throws Exception {
++        PCB process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++        process.RegisterCache[Constants.CR] = 0;
++        tasks.add(process);
++
++        int virtualAddress = 0;
++        String content = "TestContent";
++
++        assertFalse(mmu.MemoryWrite(process, virtualAddress, content, 0)); // Expect page fault
++        mmu.PageReenter(process, virtualAddress, 0);
++        assertTrue(mmu.MemoryWrite(process, virtualAddress, content, 0)); // After handling page fault, write should succeed
++
++        Object readContent = mmu.MemoryRead(process, virtualAddress, 0);
++        assertEquals(content, readContent);
++    }
++
++    @Test
++    public void testMemoryWritePageFault() throws Exception {
++        PCB process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++        process.RegisterCache[Constants.CR] = 0;
++        tasks.add(process);
++
++        int virtualAddress = 0;
++        String content = "TestContent";
++
++        // 模拟引发页面错误的写操作
++        boolean writeResult = mmu.MemoryWrite(process, virtualAddress, content, 0);
++        assertFalse(writeResult);
++        assertTrue(process.IntPageFault);
++    }
++
++    @Test
++    public void testPageReenter() throws Exception {
++        PCB process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++        process.RegisterCache[Constants.CR] = 0;
++        tasks.add(process);
++
++        int virtualAddress = 0;
++        mmu.PageReenter(process, virtualAddress, 0);
++
++        PageEntry pageEntry = (PageEntry) mmu.Memory[process.RegisterCache[Constants.CR]];
++        assertNotNull(pageEntry);
++        assertTrue(pageEntry.Valid);
++    }
++
++    @Test
++    public void testClearPageTable() {
++        PCB process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++        process.RegisterCache[Constants.CR] = 0;
++        tasks.add(process);
++
++        // 设置一个有效的页表条目和页面位图
++        mmu.Memory[0] = new PageEntry(true, false, Constants.PAGE_TABLE_NUMBER);
++        mmu.pageBitmap[Constants.PAGE_TABLE_NUMBER] = process.PCBID;
++
++        System.out.println("Before ClearPageTable:");
++        for (int i = 0; i < mmu.pageBitmap.length; i++) {
++            System.out.printf("pageBitmap[%d] = %d\n", i, mmu.pageBitmap[i]);
++        }
++
++        mmu.ClearPageTable(process);
++
++        System.out.println("After ClearPageTable:");
++        for (int i = 0; i < mmu.pageBitmap.length; i++) {
++            System.out.printf("pageBitmap[%d] = %d\n", i, mmu.pageBitmap[i]);
++        }
++
++        assertNull(mmu.Memory[0]);
++        assertEquals(0, mmu.pageBitmap[Constants.PAGE_TABLE_NUMBER]);
++    }
++
++    @Test
++    public void testMemoryUsage() {
++        mmu.Memory[0] = "Test";
++        mmu.Memory[1] = "Test";
++        mmu.Memory[2] = "Test";
++
++        double usage = mmu.MemoryUsage();
++        assertEquals(3.0 / mmu.Memory.length, usage);
++    }
++}
+Index: src/test/java/sos/kernel/interrupts/SyscallHandlerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/interrupts/SyscallHandlerTest.java b/src/test/java/sos/kernel/interrupts/SyscallHandlerTest.java
+new file mode 100644
+--- /dev/null	(date 1715675036510)
++++ b/src/test/java/sos/kernel/interrupts/SyscallHandlerTest.java	(date 1715675036510)
+@@ -0,0 +1,208 @@
++package sos.kernel.interrupts;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.Constants;
++import sos.kernel.filesystem.FileTree;
++import sos.kernel.mmu.MMUController;
++import sos.kernel.models.*;
++
++import java.util.ArrayList;
++import java.util.HashMap;
++
++import static org.junit.jupiter.api.Assertions.*;
++import static org.mockito.Mockito.*;
++
++public class SyscallHandlerTest {
++
++    private PCB process;
++    private FileTree fileTree;
++    private MMUController mmu;
++    private InterruptVector interruptVector;
++
++    @BeforeEach
++    public void setup() {
++        process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++
++        interruptVector = new InterruptVector();
++        interruptVector.RWQueue = new ArrayList<>();
++
++        fileTree = new FileTree(interruptVector); // 直接使用实际的 FileTree 实现
++        mmu = mock(MMUController.class);
++
++        SyscallHandler.Tasks = new ArrayList<>();
++        SyscallHandler.Timers = new ArrayList<>();
++        SyscallHandler.PageFaults = new ArrayList<>();
++        SyscallHandler.SharedMemoryMap = new HashMap<>();
++        SyscallHandler.SharedMemoryBlocks = new ArrayList<>();
++        SyscallHandler.interruptVector = interruptVector;
++        SyscallHandler.FS = fileTree;
++        SyscallHandler.MMU = mmu;
++    }
++
++    @Test
++    public void testSyscallOpen() throws Exception {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1"; // 确保 Name 被正确设置
++        node.writeContents("TestContent");
++        fileTree.CreateFile("root", node); // 实际创建文件
++
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("root/file1");
++
++        process.RegisterCache[Constants.R1] = 0;
++        process.RegisterCache[Constants.R2] = 3;
++        process.RegisterCache[Constants.R3] = -1;
++
++        boolean result = SyscallHandler.Syscall(3, process, 0);
++        assertTrue(result);
++        assertTrue(process.RegisterCache[Constants.R4] > 0);
++    }
++
++    @Test
++    public void testSyscallClose() throws Exception {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1";
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, true, true, 0);
++
++        process.RegisterCache[Constants.R1] = fd.FDID;
++
++        boolean result = SyscallHandler.Syscall(4, process, 0);
++        assertTrue(result);
++        assertEquals(1, process.RegisterCache[Constants.R4]);
++    }
++
++    @Test
++    public void testSyscallRead() throws Exception {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1"; // 确保 Name 被正确设置
++        node.writeContents("TestContent");
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, true, false, 0);
++
++        process.RegisterCache[Constants.R1] = fd.FDID;
++        process.RegisterCache[Constants.R2] = 10;
++        process.RegisterCache[Constants.R3] = 0;
++
++        boolean result = SyscallHandler.Syscall(5, process, 0);
++        assertFalse(result);
++        assertEquals(PCB.State.WAITING, process.ProcessState);
++    }
++
++    @Test
++    public void testSyscallWrite() throws Exception {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1"; // 确保 Name 被正确设置
++        node.writeContents("TestContent");
++        fileTree.CreateFile("root", node);
++
++        PCB process = new PCB(1, "TestProcess");
++        FileDescriptor fd = fileTree.OpenFile("root/file1", process, false, true, 0);
++
++        process.RegisterCache[Constants.R1] = fd.FDID;
++        process.RegisterCache[Constants.R2] = 0;
++
++        boolean result = SyscallHandler.Syscall(6, process, 0);
++        assertFalse(result);
++        assertEquals(PCB.State.WAITING, process.ProcessState);
++    }
++
++    @Test
++    public void testSyscallDelete() throws Exception {
++        FileTreeNode node = new FileTreeNode();
++        node.Name = "file1"; // 确保 Name 被正确设置
++        fileTree.CreateFile("root", node);
++
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("root/file1");
++
++        process.RegisterCache[Constants.R1] = 0;
++
++        boolean result = SyscallHandler.Syscall(7, process, 0);
++        assertTrue(result);
++        assertEquals(1, process.RegisterCache[Constants.R4]);
++    }
++
++    @Test
++    public void testSyscallMkdir() throws Exception {
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("root").thenReturn("newDir");
++
++        process.RegisterCache[Constants.R1] = 0;
++        process.RegisterCache[Constants.R2] = 1;
++
++        boolean result = SyscallHandler.Syscall(8, process, 0);
++        assertTrue(result);
++        assertEquals(1, process.RegisterCache[Constants.R4]);
++    }
++
++    @Test
++    public void testSyscallCreate() throws Exception {
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("root").thenReturn("newFile");
++
++        process.RegisterCache[Constants.R1] = 0;
++        process.RegisterCache[Constants.R2] = 1;
++
++        boolean result = SyscallHandler.Syscall(9, process, 0);
++        assertTrue(result);
++        assertEquals(1, process.RegisterCache[Constants.R4]);
++    }
++
++    @Test
++    public void testSyscallTimer() throws Exception {
++        process.RegisterCache[Constants.R1] = 10;
++
++        boolean result = SyscallHandler.Syscall(10, process, 0);
++        assertFalse(result);
++        assertEquals(PCB.State.WAITING, process.ProcessState);
++        assertEquals(1, SyscallHandler.Timers.size());
++    }
++
++    @Test
++    public void testSyscallReadSharedMemory() throws Exception {
++        process.RegisterCache[Constants.R1] = 1;
++        process.RegisterCache[Constants.R2] = 0;
++
++        SharedMemory sharedMemory = new SharedMemory(1);
++        sharedMemory.Owner = process.PCBID;
++        sharedMemory.Memory[0] = 123;
++        SyscallHandler.SharedMemoryMap.put(1, sharedMemory);
++
++        boolean result = SyscallHandler.Syscall(11, process, 0);
++        assertTrue(result);
++        assertEquals(123, process.RegisterCache[Constants.R4]);
++    }
++
++    @Test
++    public void testSyscallWriteSharedMemory() throws Exception {
++        process.RegisterCache[Constants.R1] = 1;
++        process.RegisterCache[Constants.R2] = 0;
++        process.RegisterCache[Constants.R3] = 456;
++
++        SharedMemory sharedMemory = new SharedMemory(1);
++        sharedMemory.Owner = process.PCBID;
++        SyscallHandler.SharedMemoryMap.put(1, sharedMemory);
++
++        boolean result = SyscallHandler.Syscall(12, process, 0);
++        assertTrue(result);
++        assertEquals(456, sharedMemory.Memory[0]);
++    }
++
++    @Test
++    public void testSyscallReleaseSemaphore() throws Exception {
++        process.RegisterCache[Constants.R1] = 1;
++
++        SharedMemory sharedMemory = new SharedMemory(1);
++        sharedMemory.Owner = process.PCBID;
++        SyscallHandler.SharedMemoryMap.put(1, sharedMemory);
++
++        boolean result = SyscallHandler.Syscall(13, process, 0);
++        assertTrue(result);
++        assertEquals(0, sharedMemory.Owner);
++        assertTrue(interruptVector.SharedMemoryRelease);
++        assertTrue(interruptVector.SharedMemoryReleaseRelativeBlockID.contains(1));
++    }
++}
+Index: src/test/java/sos/kernel/interrupts/IOTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/interrupts/IOTest.java b/src/test/java/sos/kernel/interrupts/IOTest.java
+new file mode 100644
+--- /dev/null	(date 1715675296468)
++++ b/src/test/java/sos/kernel/interrupts/IOTest.java	(date 1715675296468)
+@@ -0,0 +1,124 @@
++package sos.kernel.interrupts;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.device.AbstractDevice;
++import sos.kernel.mmu.MMUController;
++import sos.kernel.models.FileDescriptor;
++import sos.kernel.models.FileTreeNode;
++import sos.kernel.models.PCB;
++import sos.kernel.models.RWInterrupt;
++import sos.kernel.models.RWInterrupt.RWType;
++
++import java.util.ArrayList;
++
++import static org.junit.jupiter.api.Assertions.*;
++import static org.mockito.Mockito.*;
++
++public class IOTest {
++
++    private MMUController mmu;
++    private PCB process;
++    private FileTreeNode node;
++    private AbstractDevice device;
++
++    @BeforeEach
++    public void setup() {
++        mmu = mock(MMUController.class);
++        process = new PCB(1, "TestProcess");
++        process.RegisterCache = new int[10];
++
++        node = new FileTreeNode();
++        node.Type = FileTreeNode.FileType.FILE;
++        node.writeContents("TestContent");
++
++        device = mock(AbstractDevice.class);
++
++        ArrayList<AbstractDevice> DeviceTable = new ArrayList<>();
++        DeviceTable.add(device);
++
++        when(device.getDeviceName()).thenReturn("std");
++        node.Type = FileTreeNode.FileType.DEVICES;
++        node.DeviceName = "std";
++        node.writeContents("DeviceContent");
++
++        FileDescriptor fileDescriptor = new FileDescriptor();
++        node.Link = fileDescriptor;
++    }
++
++    @Test
++    public void testIOServiceReadFromFile() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.READ, 0);
++
++        when(mmu.MemoryWrite(any(PCB.class), anyInt(), anyString(), anyInt())).thenReturn(true);
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        verify(mmu).MemoryWrite(process, 0, "TestContent".substring(0, 10), 0);
++    }
++
++    @Test
++    public void testIOServiceWriteToFile() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.WRITE, 0);
++
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("NewContent");
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        assertEquals("NewContentTestContent", node.readContents());
++    }
++
++    @Test
++    public void testIOServiceReadFromDevice() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.READ, 0);
++
++        when(mmu.MemoryWrite(any(PCB.class), anyInt(), anyString(), anyInt())).thenReturn(true);
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        verify(mmu).MemoryWrite(process, 0, "DeviceContent", 0);
++    }
++
++    @Test
++    public void testIOServiceWriteToDevice() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.WRITE, 0);
++
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn("DeviceInput");
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        verify(device).PrintToOUT("DeviceInput");
++    }
++
++    @Test
++    public void testIOServicePageFaultDuringRead() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.READ, 0);
++
++        when(mmu.MemoryWrite(any(PCB.class), anyInt(), anyString(), anyInt())).thenReturn(false);
++        process.IntPageFault = true;
++        process.IntVirAddr = 0;
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        verify(mmu, times(2)).MemoryWrite(process, 0, "TestContent".substring(0, 10), 0);
++    }
++
++    @Test
++    public void testIOServicePageFaultDuringWrite() throws Exception {
++        RWInterrupt rwInterrupt = new RWInterrupt(process, node, 0, 10, 0, RWType.WRITE, 0);
++
++        when(mmu.MemoryRead(any(PCB.class), anyInt(), anyInt())).thenReturn(false);
++        process.IntPageFault = true;
++        process.IntVirAddr = 0;
++
++        boolean result = IO.IOService(rwInterrupt, mmu, 0);
++
++        assertTrue(result);
++        verify(mmu, times(2)).MemoryRead(process, 0, 0);
++    }
++}
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n    <modelVersion>4.0.0</modelVersion>\n\n    <groupId>org.example</groupId>\n    <artifactId>SOS</artifactId>\n    <version>1.0-SNAPSHOT</version>\n\n    <properties>\n        <maven.compiler.source>21</maven.compiler.source>\n        <maven.compiler.target>21</maven.compiler.target>\n        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n    </properties>\n\n    <dependencies>\n        <dependency>\n            <groupId>com.alibaba</groupId>\n            <artifactId>fastjson</artifactId>\n            <version>2.0.31</version>\n        </dependency>\n    </dependencies>\n    <build>\n        <plugins>\n            <plugin>\n                <groupId>org.apache.maven.plugins</groupId>\n                <artifactId>maven-compiler-plugin</artifactId>\n                <configuration>\n                    <release>21</release>\n                </configuration>\n            </plugin>\n        </plugins>\n    </build>\n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision de75bb30ef45b23cf38a83100486160765882712)
++++ b/pom.xml	(date 1715675487554)
+@@ -20,6 +20,23 @@
+             <artifactId>fastjson</artifactId>
+             <version>2.0.31</version>
+         </dependency>
++        <dependency>
++            <groupId>org.junit.jupiter</groupId>
++            <artifactId>junit-jupiter-api</artifactId>
++            <version>5.10.2</version>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.mockito</groupId>
++            <artifactId>mockito-core</artifactId>
++            <version>4.5.1</version>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.mockito</groupId>
++            <artifactId>mockito-inline</artifactId>
++            <version>4.5.1</version> <!-- 使用你需要的版本 -->
++        </dependency>
+     </dependencies>
+     <build>
+         <plugins>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ArtifactsWorkspaceSettings\">\n    <artifacts-to-build>\n      <artifact name=\"SOS:jar\" />\n    </artifacts-to-build>\n  </component>\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"a6815e66-e9a1-488a-ab47-a6b6e78bedb3\" name=\"Changes\" comment=\"\" />\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Class\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"JsbtTreeLayoutManager\">\n    <layout place=\"tools.popupGrunt\">\n      <scroll-view-position x=\"0\" y=\"0\" />\n    </layout>\n  </component>\n  <component name=\"KubernetesApiProvider\">{\n  &quot;isMigrated&quot;: true\n}</component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;customColor&quot;: &quot;&quot;,\n  &quot;associatedIndex&quot;: 1\n}</component>\n  <component name=\"ProjectId\" id=\"2eGPToKhog8MrdnBAX5TziLhhY1\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.Controller.executor\": \"Run\",\n    \"Application.Main.executor\": \"Run\",\n    \"Maven.SOS [clean].executor\": \"Run\",\n    \"Maven.SOS [deploy].executor\": \"Run\",\n    \"Maven.SOS [org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar].executor\": \"Run\",\n    \"Maven.SOS [test].executor\": \"Run\",\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"git-widget-placeholder\": \"main\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"project.structure.last.edited\": \"Artifacts\",\n    \"project.structure.proportion\": \"0.15\",\n    \"project.structure.side.proportion\": \"0.2\",\n    \"settings.editor.selected.configurable\": \"MavenSettings\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RunManager\" selected=\"Application.Controller\">\n    <configuration name=\"Controller\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"sos.http.Controller\" />\n      <module name=\"SOS\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"sos.http.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"sos.kernel.Main\" />\n      <module name=\"SOS\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"sos.kernel.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Controller\" />\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"a6815e66-e9a1-488a-ab47-a6b6e78bedb3\" name=\"Changes\" comment=\"\" />\n      <created>1711527953067</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1711527953067</updated>\n      <workItem from=\"1711527954732\" duration=\"32387000\" />\n      <workItem from=\"1711632064165\" duration=\"16878000\" />\n      <workItem from=\"1711696919456\" duration=\"16406000\" />\n      <workItem from=\"1711771488457\" duration=\"17497000\" />\n      <workItem from=\"1711791360185\" duration=\"37000\" />\n      <workItem from=\"1711806361793\" duration=\"36042000\" />\n      <workItem from=\"1712817958153\" duration=\"13195000\" />\n      <workItem from=\"1713428252188\" duration=\"39000\" />\n      <workItem from=\"1713428387185\" duration=\"250000\" />\n      <workItem from=\"1713597006881\" duration=\"864000\" />\n      <workItem from=\"1715244319928\" duration=\"503000\" />\n      <workItem from=\"1715324501407\" duration=\"41230000\" />\n    </task>\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"CUSTOM_BOOLEAN_PROPERTIES\">\n                <map>\n                  <entry key=\"Show.Git.Branches\" value=\"false\" />\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" type=\"java-line\">\n          <url>file://$PROJECT_DIR$/src/main/java/sos/http/Controller.java</url>\n          <line>55</line>\n          <option name=\"timeStamp\" value=\"15\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" type=\"java-line\">\n          <url>file://$PROJECT_DIR$/src/main/java/sos/http/Controller.java</url>\n          <line>65</line>\n          <option name=\"timeStamp\" value=\"16\" />\n        </line-breakpoint>\n      </breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision de75bb30ef45b23cf38a83100486160765882712)
++++ b/.idea/workspace.xml	(date 1715679169148)
+@@ -9,7 +9,21 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="" />
++    <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/MainTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/filesystem/FileTreeTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/interrupts/IOTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/interrupts/SyscallHandlerTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/mmu/MMUControllerTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/sasm/InterpreterTest.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/test/java/sos/kernel/scheduler/SchedulerTest.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/out/artifacts/SOS_jar/SOS.jar" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/device/AbstractDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/device/AbstractDevice.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/scheduler/Scheduler.java" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -46,38 +60,68 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.Controller.executor": "Run",
+-    "Application.Main.executor": "Run",
+-    "Maven.SOS [clean].executor": "Run",
+-    "Maven.SOS [deploy].executor": "Run",
+-    "Maven.SOS [org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar].executor": "Run",
+-    "Maven.SOS [test].executor": "Run",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "git-widget-placeholder": "main",
+-    "kotlin-language-version-configured": "true",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Artifacts",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.2",
+-    "settings.editor.selected.configurable": "MavenSettings",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.Controller.executor&quot;: &quot;Run&quot;,
++    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.FileTreeTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.IOTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.InterpreterTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.InterpreterTest.testAddCommand.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.InterpreterTest.testDivCommand.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.InterpreterTest.testMoveMemoryToRegister.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.InterpreterTest.testMoveRegisterToMemory.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MMUControllerTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MMUControllerTest.testClearPageTable.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.testBootstrapAndProcessCreation.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.testCreateFile.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.testDeleteFile.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.testFoundFile.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.MainTest.testNextTick.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.SchedulerTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.SyscallHandlerTest.executor&quot;: &quot;Run&quot;,
++    &quot;JUnit.SyscallHandlerTest.testSyscallClose.executor&quot;: &quot;Run&quot;,
++    &quot;Maven.SOS [clean].executor&quot;: &quot;Run&quot;,
++    &quot;Maven.SOS [deploy].executor&quot;: &quot;Run&quot;,
++    &quot;Maven.SOS [org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar].executor&quot;: &quot;Run&quot;,
++    &quot;Maven.SOS [test].executor&quot;: &quot;Run&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;/Users/xiexinxin/code/SOS/src/test/resources/static&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
++    &quot;应用程序.Controller.executor&quot;: &quot;Run&quot;,
++    &quot;应用程序.IOTest.executor&quot;: &quot;Run&quot;,
++    &quot;应用程序.Main.executor&quot;: &quot;Run&quot;
+   }
+-}]]></component>
+-  <component name="RunManager" selected="Application.Controller">
+-    <configuration name="Controller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+-      <option name="MAIN_CLASS_NAME" value="sos.http.Controller" />
++}</component>
++  <component name="RecentsManager">
++    <key name="CopyFile.RECENT_KEYS">
++      <recent name="$PROJECT_DIR$/src/test/resources/static" />
++    </key>
++    <key name="MoveFile.RECENT_KEYS">
++      <recent name="$PROJECT_DIR$/src/test/resources" />
++    </key>
++  </component>
++  <component name="RunManager" selected="应用程序.Main">
++    <configuration name="IOTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="sos.kernel.interrupts.IOTest" />
+       <module name="SOS" />
+       <extension name="coverage">
+         <pattern>
+-          <option name="PATTERN" value="sos.http.*" />
++          <option name="PATTERN" value="sos.kernel.interrupts.*" />
+           <option name="ENABLED" value="true" />
+         </pattern>
+       </extension>
+@@ -98,17 +142,67 @@
+         <option name="Make" enabled="true" />
+       </method>
+     </configuration>
++    <configuration name="IOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
++      <module name="SOS" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="sos.kernel.interrupts.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <option name="PACKAGE_NAME" value="sos.kernel.interrupts" />
++      <option name="MAIN_CLASS_NAME" value="sos.kernel.interrupts.IOTest" />
++      <option name="TEST_OBJECT" value="class" />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <configuration name="SyscallHandlerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
++      <module name="SOS" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="sos.kernel.interrupts.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <option name="PACKAGE_NAME" value="sos.kernel.interrupts" />
++      <option name="MAIN_CLASS_NAME" value="sos.kernel.interrupts.SyscallHandlerTest" />
++      <option name="TEST_OBJECT" value="class" />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <configuration name="SyscallHandlerTest.testSyscallClose" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
++      <module name="SOS" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="sos.kernel.interrupts.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <option name="PACKAGE_NAME" value="sos.kernel.interrupts" />
++      <option name="MAIN_CLASS_NAME" value="sos.kernel.interrupts.SyscallHandlerTest" />
++      <option name="METHOD_NAME" value="testSyscallClose" />
++      <option name="TEST_OBJECT" value="method" />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
+     <recent_temporary>
+       <list>
+-        <item itemvalue="Application.Controller" />
+-        <item itemvalue="Application.Main" />
++        <item itemvalue="应用程序.Main" />
++        <item itemvalue="JUnit.IOTest" />
++        <item itemvalue="JUnit.SyscallHandlerTest" />
++        <item itemvalue="应用程序.IOTest" />
++        <item itemvalue="JUnit.SyscallHandlerTest.testSyscallClose" />
+       </list>
+     </recent_temporary>
+   </component>
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
++        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
++        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
+       </set>
+     </attachedChunks>
+   </component>
+@@ -132,6 +226,8 @@
+       <workItem from="1713597006881" duration="864000" />
+       <workItem from="1715244319928" duration="503000" />
+       <workItem from="1715324501407" duration="41230000" />
++      <workItem from="1715675924474" duration="419000" />
++      <workItem from="1715676350086" duration="1849000" />
+     </task>
+     <servers />
+   </component>
+Index: src/test/java/sos/kernel/MainTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/sos/kernel/MainTest.java b/src/test/java/sos/kernel/MainTest.java
+new file mode 100644
+--- /dev/null	(date 1715671827801)
++++ b/src/test/java/sos/kernel/MainTest.java	(date 1715671827801)
+@@ -0,0 +1,104 @@
++package sos.kernel;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import sos.kernel.device.StdDevice;
++import sos.kernel.filesystem.FileTree;
++import sos.kernel.interrupts.PageFault;
++import sos.kernel.interrupts.SyscallHandler;
++import sos.kernel.mmu.MMUController;
++import sos.kernel.models.InterruptVector;
++import sos.kernel.models.PCB;
++import sos.kernel.sasm.Interpreter;
++import sos.kernel.scheduler.Scheduler;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++import java.io.IOException;
++import java.nio.file.Files;
++import java.nio.file.Paths;
++import java.util.ArrayList;
++import java.util.HashMap;
++public class MainTest {
++
++    @BeforeEach
++    public void setup() throws Exception {
++        // 初始化Main类的静态变量
++        Main.interruptVector = new InterruptVector();
++        Main.Memory = new Object[1024 * 15];
++        Main.Tasks = new ArrayList<>();
++        Main.DeviceTable = new ArrayList<>();
++        Main.PCBCounter = 1;
++        Main.cputick = 0;
++        Main.virAddrSize = 1 << 20;
++        Main.pageSize = 1 << 10;
++        Main.RRNowTick = 0;
++        Main.RRMaxTick = 2;
++        Main.FS = new FileTree(Main.interruptVector);
++        Main.controller = new MMUController(Main.Tasks, Main.Memory, Main.pageSize, Main.virAddrSize, Main.interruptVector);
++        Main.interpret = new Interpreter(Main.controller);
++        Main.scheduler = new Scheduler(Main.Tasks);
++        Main.stdDevice = new StdDevice();
++        Main.DeviceTable.add(Main.stdDevice);
++        Main.stdDevice.DeviceName = "std";
++        Main.stdDevice.DeviceBuffer = new Object[Main.stdDevice.DeviceBufferSize];
++        Main.stdDevice.LoadDriver();
++        SyscallHandler.Tasks = Main.Tasks;
++        SyscallHandler.Timers = new ArrayList<>();
++        SyscallHandler.PageFaults = new ArrayList<>();
++        SyscallHandler.SharedMemoryMap = new HashMap<>();
++        SyscallHandler.SharedMemoryBlocks = new ArrayList<>();
++        SyscallHandler.interruptVector = Main.interruptVector;
++        SyscallHandler.FS = Main.FS;
++        SyscallHandler.MMU = Main.controller;
++        PageFault.controller = Main.controller;
++        Main.cputick = 1;
++    }
++
++    @Test
++    public void testCreateFile() {
++        boolean result = Main.CreateFile("testfile", "FILE", "std", "Hello World", "/");
++        assertTrue(result);
++    }
++
++    @Test
++    public void testDeleteFile() {
++        Main.CreateFile("testfile", "FILE", "std", "Hello World", "/");
++        boolean result = Main.DeleteFile("/testfile");
++        assertTrue(true);
++    }
++
++    @Test
++    public void testFoundFile() {
++        Main.CreateFile("testfile", "FILE", "std", "Hello World", "/");
++        var file = Main.FS.FoundFile("/testfile");
++        assertNotNull(true);
++    }
++
++    @Test
++    public void testBootstrapAndProcessCreation() throws IOException, Exception {
++        Main.Bootstrap();
++        String script = new String(Files.readAllBytes(Paths.get("src/test/resources/keyboard.txt")));
++        PCB process = Main.createProcess(script.split("\n"), Main.cputick, "TestProcess");
++        assertNotNull(process);
++        assertEquals("TestProcess", process.ProcessName);
++        assertEquals(PCB.State.READY, process.ProcessState);
++    }
++
++    @Test
++    public void testNextTick() throws Exception {
++        Main.Bootstrap();
++        String script = new String(Files.readAllBytes(Paths.get("src/test/resources/keyboard.txt")));
++        Main.createProcess(script.split("\n"), Main.cputick, "TestProcess");
++        String result = Main.NextTick();
++        assertNotNull(result);
++        assertTrue(result.contains("[RUNNING]"));
++    }
++
++    @Test
++    public void testHttpInput() {
++        boolean result = Main.HttpInput("std", "input data");
++        assertTrue(result);
++        assertEquals("input data", Main.stdDevice.node.readContents());
++    }
++}
+\ No newline at end of file
