@@ -10,14 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/device/StdDevice.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/mmu/MMUController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/models/FileTreeNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/sasm/Interpreter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/scriptIO.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/PageFault.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/sos/kernel/interrupts/PageFault.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,12 +71,12 @@
     "project.structure.last.edited": "Artifacts",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "MavenSettings",
+    "settings.editor.selected.configurable": "project.propCompiler",
     "vue.rearranger.settings.migration": "true",
     "应用程序.Controller.executor": "Run"
   }
 }]]></component>
-  <component name="RunManager" selected="应用程序.Controller">
+  <component name="RunManager" selected="Application.Controller">
     <configuration name="Controller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="sos.http.Controller" />
       <module name="SOS" />
@@ -111,14 +105,14 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="应用程序.Controller" />
+        <item itemvalue="Application.Controller" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
       </set>
     </attachedChunks>
   </component>
@@ -143,6 +137,7 @@
       <workItem from="1715244319928" duration="503000" />
       <workItem from="1715324501407" duration="41230000" />
       <workItem from="1715686207238" duration="8576000" />
+      <workItem from="1715938973770" duration="810000" />
     </task>
     <servers />
   </component>
