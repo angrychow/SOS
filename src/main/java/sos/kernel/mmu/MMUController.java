@@ -13,7 +13,7 @@ public class MMUController {
     public Object[] Memory;
     public ArrayList<PCB> Tasks;
     public int[] pageBitmap; // indicate who(PCBID) holds this page
-    int[] pageLastVisit;
+    public int[] pageLastVisit;
     int pageSize;
     int pageTableSize;
     int phyPageSize;

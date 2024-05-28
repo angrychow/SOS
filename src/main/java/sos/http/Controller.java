@@ -8,6 +8,7 @@ import sos.kernel.Main;
 import sos.kernel.device.DeviceStatus;
 import sos.kernel.device.HttpDevice1;
 import sos.kernel.filesystem.FileTree;
+import sos.kernel.mmu.MMUController;
 import sos.kernel.models.FileTreeNode;
 import sos.kernel.models.MMUInfo;
 import sos.kernel.models.PCB;
@@ -134,6 +135,7 @@ public class Controller {
             MMUInfo mmuInfo = new MMUInfo();
             mmuInfo.pageBitmap= indexValueMap;
             mmuInfo.memoryUsage= controller.MemoryUsage();
+            mmuInfo.pageLastVisit = controller.pageLastVisit;
             String response =JSON.toJSONString(mmuInfo);
             exchange.sendResponseHeaders(200, response.getBytes().length);
             OutputStream outputStream = exchange.getResponseBody();
