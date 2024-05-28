@@ -11,7 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a6815e66-e9a1-488a-ab47-a6b6e78bedb3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/SOS_jar/SOS.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +138,7 @@
       <workItem from="1715324501407" duration="41230000" />
       <workItem from="1715686207238" duration="8576000" />
       <workItem from="1715938973770" duration="5734000" />
-      <workItem from="1716873723185" duration="494000" />
+      <workItem from="1716873723185" duration="571000" />
     </task>
     <servers />
   </component>
